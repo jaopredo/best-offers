@@ -1,0 +1,74 @@
+import {
+    Controller,
+    Post,
+    Body,
+
+    BadRequestException,
+    UnauthorizedException,
+} from "@nestjs/common"
+import { JwtService } from "@nestjs/jwt"
+import bcrypt from 'bcrypt'
+
+/* TIPOS */
+import { UserRegisterDto, UserLoginDto } from "types/auth/auth.dto"
+
+/* SERVIÇOS */
+import { AuthService } from "./auth.service"
+
+@Controller('/auth')
+export class AuthController {
+    constructor(
+        private authService: AuthService,
+        private jwtService: JwtService
+    ){}
+
+    @Post('/register')
+    async register(@Body() user: UserRegisterDto) {
+        // Checando se já não existe um usuário registrado
+        // com o mesmo email
+        const users = await this.authService.getUser({ email: user.email })
+        if (users.length != 0) {
+            throw new BadRequestException('Um usuário com este email já está cadastrado')
+        }
+
+        // Cria o usuário no banco
+        const registeredUser = await this.authService.registerUser(user)
+        
+        // Retorna uma mensagem de sucesso
+        return {
+            message: 'Usuário registrado com sucesso',
+            token: await this.jwtService.signAsync({
+                name: registeredUser.name,
+                email: registeredUser.email,
+                role: registeredUser.role
+            })
+        }
+    }
+
+    @Post('/login')
+    async login(@Body() payload: UserLoginDto) {
+        // Procuro o usuário com o email informado
+        const users = await this.authService.getUser({ email: payload.email })
+        if (users.length == 0) {
+            throw new BadRequestException('Nenhum usuário com esse email encontrado')
+        }
+
+        // Pego o primeiro usuário (Em teoria sempre terá apenas 1)
+        const user = users[0]
+
+        // Faço a comparação entre a senha passada e a senha hash
+        if (!bcrypt.compareSync(payload.password, user.password)) {
+            throw new UnauthorizedException('Senha incorreta, por favor, tente novamente')
+        }
+
+        // Retorno a resposta da requisição
+        return {
+            message: 'Usuário logado com sucesso',
+            token: await this.jwtService.signAsync({
+                name: user.name,
+                email: user.email,
+                role: user.role
+            })
+        }
+    }
+}
