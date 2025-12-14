@@ -12,7 +12,7 @@ describe('Authentication (e2e)', () => {
     let app: INestApplication<App>
     let dataSource: DataSource
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [
             ConfigModule.forRoot({
@@ -47,7 +47,7 @@ describe('Authentication (e2e)', () => {
         }
     })
 
-    afterEach(async () => {
+    afterAll(async () => {
         await app.close()
     })
 
@@ -89,19 +89,63 @@ describe('Authentication (e2e)', () => {
     })
     
     it('Registra um usuário, testa o registro de um mesmo email e testa o login', async () => {
-        await request(app.getHttpServer())
+        // Registrando o usuário
+        const register_res = await request(app.getHttpServer())
             .post('/auth/register')
             .send(register_user)
             .expect(201)
-            
-        await request(app.getHttpServer())
+        // Formato esperado da resposta do corpo da requisição
+        expect(register_res.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                token: expect.any(String),
+                statusCode: 201
+            })
+        )
+        
+        // Tentando registrar o mesmo usuário novamente
+        const duplicate_register_res = await request(app.getHttpServer())
             .post('/auth/register')
             .send(register_user)
             .expect(400)
-            
-        await request(app.getHttpServer())
+        // Formato esperado da resposta do corpo da requisição
+        expect(duplicate_register_res.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                error: expect.any(String),
+                statusCode: 400
+            })
+        )
+        
+        // Fazendo login do usuário antes registrado
+        const login_res = await request(app.getHttpServer())
             .post('/auth/login')
             .send(login_user)
-            .expect(201)
+            .expect(200)
+        // Checando o corpo da requisição
+        expect(login_res.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                token: expect.any(String),
+                statusCode: 200
+            })
+        )
+    })
+
+    it('Tenta fazer login de um usuário que não está registrado', async () => {
+        const failed_login_res = await request(app.getHttpServer())
+            .post('/auth/login')
+            .send({
+                email: 'notRegisteredFoo@gmail.com',
+                password: '12345678'
+            })
+            .expect(404)
+        expect(failed_login_res.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                error: expect.any(String),
+                statusCode: 404
+            })
+        )
     })
 })
