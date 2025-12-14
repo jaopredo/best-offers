@@ -30,6 +30,7 @@ import { User } from 'database/models/user'
         })
     ],
     controllers: [AuthController],
-    providers: [AuthService]
+    providers: [AuthService],
+    exports: [JwtModule]
 })
 export class AuthModule {}

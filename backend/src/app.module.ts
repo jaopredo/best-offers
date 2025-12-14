@@ -28,7 +28,7 @@ import { Item } from 'database/models/item'
                 password: config.get('DB_PASSWORD'),
                 database: config.get('DB_DB'),
                 entities: [ User, Font, Adapter, Category, Item ],
-                synchronize: config.get('NODE_ENV') == 'test',
+                synchronize: config.get('NODE_ENV') == 'dev',
                 logging: false
             })
         })
