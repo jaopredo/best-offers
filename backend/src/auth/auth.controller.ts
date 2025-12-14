@@ -2,9 +2,10 @@ import {
     Controller,
     Post,
     Body,
-
+    HttpCode,
     BadRequestException,
     UnauthorizedException,
+    NotFoundException,
 } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 import bcrypt from 'bcrypt'
@@ -41,16 +42,18 @@ export class AuthController {
                 name: registeredUser.name,
                 email: registeredUser.email,
                 role: registeredUser.role
-            })
+            }),
+            statusCode: 201
         }
     }
 
     @Post('/login')
+    @HttpCode(200)
     async login(@Body() payload: UserLoginDto) {
         // Procuro o usuário com o email informado
         const users = await this.authService.getUser({ email: payload.email })
         if (users.length == 0) {
-            throw new BadRequestException('Nenhum usuário com esse email encontrado')
+            throw new NotFoundException('Nenhum usuário com esse email encontrado')
         }
 
         // Pego o primeiro usuário (Em teoria sempre terá apenas 1)
@@ -68,7 +71,8 @@ export class AuthController {
                 name: user.name,
                 email: user.email,
                 role: user.role
-            })
+            }),
+            statusCode: 200
         }
     }
 }

@@ -51,14 +51,20 @@ describe('Authentication (e2e)', () => {
         await app.close()
     })
 
-    const register_user = {
-        email: 'foo@gmail.com',
+    const register_user_1 = {
+        email: 'foo1@gmail.com',
         password: '12345678',
-        name: 'Foo User'
+        name: 'Foo User 1'
+    }
+
+    const register_user_2 = {
+        email: 'foo2@gmail.com',
+        password: '12345678',
+        name: 'Foo User 2'
     }
 
     const login_user = {
-        email: 'foo@gmail.com',
+        email: 'foo1@gmail.com',
         password: '12345678',
     }
 
@@ -92,7 +98,7 @@ describe('Authentication (e2e)', () => {
         // Registrando o usuário
         const register_res = await request(app.getHttpServer())
             .post('/auth/register')
-            .send(register_user)
+            .send(register_user_1)
             .expect(201)
         // Formato esperado da resposta do corpo da requisição
         expect(register_res.body).toEqual(
@@ -106,7 +112,7 @@ describe('Authentication (e2e)', () => {
         // Tentando registrar o mesmo usuário novamente
         const duplicate_register_res = await request(app.getHttpServer())
             .post('/auth/register')
-            .send(register_user)
+            .send(register_user_1)
             .expect(400)
         // Formato esperado da resposta do corpo da requisição
         expect(duplicate_register_res.body).toEqual(
@@ -145,6 +151,28 @@ describe('Authentication (e2e)', () => {
                 message: expect.any(String),
                 error: expect.any(String),
                 statusCode: 404
+            })
+        )
+    })
+
+    it('Tenta fazer login incorreto de um usuário (Senha incorreta)', async () => {
+        await request(app.getHttpServer())
+            .post('/auth/register')
+            .send(register_user_2)
+            .expect(201)
+        
+        const failed_login_res = await request(app.getHttpServer())
+            .post('/auth/login')
+            .send({
+                email: register_user_2.email,
+                password: 'wrong password'
+            })
+            .expect(401)
+        expect(failed_login_res.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                statusCode: 401,
+                error: expect.any(String)
             })
         )
     })
