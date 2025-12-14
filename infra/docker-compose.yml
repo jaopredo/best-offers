@@ -1,20 +1,5 @@
 services:
-    redis:
-        image: redis:7
-        container_name: redis
-        ports:
-            - "6379:6379"
-        volumes:
-            - redis_data:/data
-    
-    n8n:
-        container_name: n8n
-        image: docker.n8n.io/n8nio/n8n
-        volumes:
-            - n8n_data:/home/node/.n8n
-        ports:
-            - "5678:5678"
-
+    # Serviços específicos para produção
     db:
         container_name: database
         profiles: ["prod"]
@@ -28,8 +13,47 @@ services:
         ports:
             - "5432:5432"
     
+    backend-prod:
+        container_name: backend
+        profiles: ["prod"]
+        build:
+            context: ../backend
+        environment:
+            NODE_ENV: production
+        ports:
+            - 3000:3000
+    
+    frontend-prod:
+        container_name: frontend
+        profiles: ["prod"]
+        build:
+            context: ../frontend
+        environment:
+            NODE_ENV: production
+        ports:
+            - 8000:8000
+    
+    redis:
+        image: redis:7
+        container_name: redis
+        profiles: ["prod"]
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+    
+    n8n:
+        container_name: n8n
+        image: docker.n8n.io/n8nio/n8n
+        profiles: ["prod"]
+        volumes:
+            - n8n_data:/home/node/.n8n
+        ports:
+            - "5678:5678"
+    
+    # Serviços específicos para desenvolvimento local
     db-dev:
-        container_name: database-dev
+        container_name: database.dev
         profiles: ["dev"]
         image: postgres
         environment:
@@ -41,21 +65,11 @@ services:
         ports:
             - "5432:5432"
 
-    backend-prod:
-        container_name: backend.prod
-        profiles: ["prod"]
-        build:
-            context: ../backend
-        environment:
-            NODE_ENV: production
-        ports:
-            - 3000:3000
-
     backend-dev:
         container_name: backend.dev
         profiles: ["dev"]
         env_file:
-            - ../backend/.env
+            - ../backend/.env.development.local
         build:
             context: ../backend
             dockerfile: Dockerfile.dev
@@ -64,17 +78,6 @@ services:
         volumes:
             - ../backend:/usr/src/app
         command: yarn start:dev
-  
-
-    frontend-prod:
-        container_name: frontend.prod
-        profiles: ["prod"]
-        build:
-            context: ../frontend
-        environment:
-            NODE_ENV: production
-        ports:
-            - 8000:8000
     
     frontend-dev:
         container_name: frontend.dev
@@ -89,6 +92,38 @@ services:
         volumes:
             - ../frontend:/usr/src/app
         command: yarn dev
+    
+    redis-dev:
+        image: redis:7
+        container_name: redis.dev
+        profiles: ["prod"]
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+    
+    n8n-dev:
+        container_name: n8n.dev
+        image: docker.n8n.io/n8nio/n8n
+        profiles: ["prod"]
+        volumes:
+            - n8n_data:/home/node/.n8n
+        ports:
+            - "5678:5678"
+    
+    # Serviços para testes E2E
+    db-tests:
+        container_name: database.tests
+        profiles: ["tests"]
+        image: postgres
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: offers-tests
+        volumes:
+            - postgres_data:/var/lib/postgresql/
+        ports:
+            - "5433:5432"
 
 volumes:
     n8n_data:
