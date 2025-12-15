@@ -96,6 +96,7 @@ describe('Adapter (e2e)', () => {
             expect(resFirstAdapter.body).toEqual(
                 expect.objectContaining({
                     message: expect.any(String),
+                    statusCode: 201,
                     adapter: {
                         id: expect.any(Number),
                         ...firstTypeAdapter
@@ -111,6 +112,7 @@ describe('Adapter (e2e)', () => {
             expect(resSecondAdapter).toEqual(
                 expect.objectContaining({
                     message: expect.any(String),
+                    statusCode: 201,
                     adapter: {
                         id: expect.any(Number),
                         ...secondTypeAdapter
@@ -157,14 +159,14 @@ describe('Adapter (e2e)', () => {
 
     describe('(GET) /adapter/:id', () => {
         it('Pegar um adapter específica', async () => {
-            const res = await userRequest(request(app.getHttpServer()).post('/adapter'))
+            const { body: { adapter } } = await userRequest(request(app.getHttpServer()).post('/adapter'))
                 .send(firstTypeAdapter)
                 .expect(201)
             
-            const get_res = await userRequest(request(app.getHttpServer()).get(`/adapter/${res.body.id}`))
+            const get_res = await userRequest(request(app.getHttpServer()).get(`/adapter/${adapter.id}`))
                 .expect(200)
             expect(get_res.body).toStrictEqual({
-                id: res.body.id,
+                id: adapter.body.id,
                 ...firstTypeAdapter
             })
         })
@@ -246,7 +248,7 @@ describe('Adapter (e2e)', () => {
 
     describe('(PATCH) /adapter/:id', () => {
         it('Atualiza um adapter', async () => {
-            const { body: adapter } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
+            const { body: { adapter } } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
                 .send(firstTypeAdapter)
             
             const res = await adminRequest(request(app.getHttpServer()).patch(`/adapter/${adapter.id}`))
@@ -261,8 +263,7 @@ describe('Adapter (e2e)', () => {
                     message: expect.any(String),
                     statusCode: 200,
                     adapter: {
-                        id: adapter.id,
-                        ...firstTypeAdapter,
+                        ...adapter,
                         sep: 'test-sep'
                     }
                 })
@@ -273,8 +274,7 @@ describe('Adapter (e2e)', () => {
                 .expect(200)
             
             expect(get_res.body).toStrictEqual({
-                id: adapter.id,
-                ...firstTypeAdapter,
+                ...adapter,
                 name: 'test-sep'
             })
         })
@@ -302,7 +302,7 @@ describe('Adapter (e2e)', () => {
         })
 
         it('Passa informações que não existem', async() => {
-            const { body: adapter } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
+            const { body: { adapter } } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
                 .send(firstTypeAdapter)
             
             const res = await adminRequest(request(app.getHttpServer()).patch(`/adapter/${adapter.id}`))
@@ -317,7 +317,7 @@ describe('Adapter (e2e)', () => {
 
     describe('(DELETE) /adapter/:id', () => {
         it('Deleta um adapter', async () => {
-            const { body: adapter } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
+            const { body: { adapter } } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
                 .send(firstTypeAdapter)
             
             const res = await adminRequest(request(app.getHttpServer()).delete(`/adapter/${adapter.id}`))
@@ -327,10 +327,7 @@ describe('Adapter (e2e)', () => {
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 200,
-                    adapter: {
-                        id: adapter.id,
-                        ...firstTypeAdapter
-                    }
+                    adapter
                 })
             )
 
