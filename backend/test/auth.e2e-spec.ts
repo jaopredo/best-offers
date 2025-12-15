@@ -36,16 +36,21 @@ describe('Authentication (e2e)', () => {
         )
 
         await app.init()
+    })
 
+    beforeEach(async () => {
         // Resetando todas as informações no banco de teste para realizar os testes
         // seguidamente quantas vezes eu quiser
         dataSource = app.get<DataSource>(DataSource)
-        const entities = dataSource.entityMetadatas
-        for (const entity of entities) {
-        const repository = dataSource.getRepository(entity.name)
-        await repository.query(`TRUNCATE TABLE "${entity.tableName}" RESTART IDENTITY CASCADE`)
-        }
+        const tableNames = dataSource.entityMetadatas
+            .map(entity => `"${entity.tableName}"`)
+            .join(', ')
+
+        await dataSource.query(
+            `TRUNCATE ${tableNames} RESTART IDENTITY CASCADE`
+        )
     })
+    
 
     afterAll(async () => {
         await app.close()

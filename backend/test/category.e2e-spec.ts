@@ -51,11 +51,13 @@ describe('Category (e2e)', () => {
         // Resetando todas as informações no banco de teste para realizar os testes
         // seguidamente quantas vezes eu quiser
         dataSource = app.get<DataSource>(DataSource)
-        const entities = dataSource.entityMetadatas
-        for (const entity of entities) {
-            const repository = dataSource.getRepository(entity.name)
-            await repository.query(`TRUNCATE TABLE "${entity.tableName}" RESTART IDENTITY CASCADE`)
-        }
+        const tableNames = dataSource.entityMetadatas
+            .map(entity => `"${entity.tableName}"`)
+            .join(', ')
+
+        await dataSource.query(
+            `TRUNCATE ${tableNames} RESTART IDENTITY CASCADE`
+        )
 
         // Pegando um token para usuário e para administrador
         userToken = await getUserAuthToken(app.getHttpServer())
@@ -90,15 +92,13 @@ describe('Category (e2e)', () => {
         )
     }
 
-    const userRequest = () => request(app.getHttpServer()).set('Authorization', `Bearer ${userToken}`)
-    const adminRequest = () => request(app.getHttpServer()).set('Authorization', `Bearer ${adminToken}`)
-    const guestRequest = () => request(app.getHttpServer())
+    const userRequest = (req) => req.set('Authorization', `Bearer ${userToken}`)
+    const adminRequest = (req) => req.set('Authorization', `Bearer ${adminToken}`)
 
 
     describe('(POST) /category', () => {
         it('Deve registrar duas categorias distintas', async() => {
-            const categ1_res = await adminRequest()
-                .post('/category')
+            const categ1_res = await adminRequest(request(app.getHttpServer()).post('/category'))
                 .send(category1)
                 .expect(201)
             
@@ -113,8 +113,7 @@ describe('Category (e2e)', () => {
                 })
             )
 
-            const categ2_res = await adminRequest()
-                .post('/category')
+            const categ2_res = await adminRequest(request(app.getHttpServer()).post('/category'))
                 .send(category2)
                 .expect(201)
             
@@ -131,8 +130,7 @@ describe('Category (e2e)', () => {
         })
 
         it('Envia uma informação diferente do que o esperado para a rota', async() => {
-            const res = await adminRequest()
-                .post('/category')
+            const res = await adminRequest(request(app.getHttpServer()).post('/category'))
                 .send({
                     foo: 'info'
                 })
@@ -142,15 +140,14 @@ describe('Category (e2e)', () => {
         })
 
         it('Tenta acessar a rota sem o token JWT', async() => {
-            const res = await guestRequest()
+            const res = await request(app.getHttpServer())
                 .post('/category')
                 .expect(401)
             validateError(res.body, 401)
         })
 
         it('Usuário comum tenta acessar a rota', async() => {
-            const res = await userRequest()
-                .post('/category')
+            const res = await userRequest(request(app.getHttpServer()).post('/category'))
                 .expect(401)
             validateError(res.body, 401)
         })
@@ -158,13 +155,11 @@ describe('Category (e2e)', () => {
 
     describe('(GET) /category/:id', () => {
         it('Pegar uma categoria específica', async () => {
-            const res = await userRequest()
-                .post('/category')
+            const res = await userRequest(request(app.getHttpServer()).post('/category'))
                 .send(category3)
                 .expect(201)
             
-            const get_res = await userRequest()
-                .get(`/category/${res.body.id}`)
+            const get_res = await userRequest(request(app.getHttpServer()).get(`/category/${res.body.id}`))
                 .expect(200)
             expect(get_res.body).toStrictEqual({
                 id: res.body.id,
@@ -173,15 +168,14 @@ describe('Category (e2e)', () => {
         })
 
         it('Tenta requisição sem token', async () => {
-            const res = await guestRequest()
+            const res = await request(app.getHttpServer())
                 .get('/category/1')
                 .expect(401)
             validateError(res.body, 401)
         })
 
         it('Tenta pegar categoria que não existe', async () => {
-            const res = await userRequest()
-                .get(`/category/200`)
+            const res = await userRequest(request(app.getHttpServer()).get(`/category/200`))
                 .expect(404)
             validateError(res.body, 404)
         })
@@ -197,15 +191,16 @@ describe('Category (e2e)', () => {
             // Registrando todas as categorias
             let categories = [category1, category2, category3, category4]
             for (let category of categories) {
-                await userRequest()
-                    .post('/category')
+                await userRequest(request(app.getHttpServer()).post('/category'))
                     .send(category)
                     .expect(201)
             }
             
             // Checando a resposta do GET
-            const res = await userRequest()
+            const res = await userRequest(
+                request(app.getHttpServer())
                 .get(`/category?page=${paginationInfo.page}&limit=${paginationInfo.limit}`)
+            )
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
@@ -225,15 +220,13 @@ describe('Category (e2e)', () => {
             // Registrando todas as categorias
             let categories = [category1, category2, category3, category4]
             for (let category of categories) {
-                await userRequest()
-                    .post('/category')
+                await userRequest(request(app.getHttpServer()).post('/category'))
                     .send(category)
                     .expect(201)
             }
             
             // Checando a resposta do GET
-            const res = await userRequest()
-                .get(`/category`)
+            const res = await userRequest(request(app.getHttpServer()).get(`/category`))
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
@@ -250,7 +243,7 @@ describe('Category (e2e)', () => {
         })
 
         it('Tenta pegar sem passar um token', async () => {
-            const res = await guestRequest()
+            const res = await request(app.getHttpServer())
                 .get('/category')
                 .expect(401)
             
@@ -260,12 +253,11 @@ describe('Category (e2e)', () => {
 
     describe('(PATCH) /category/:id', () => {
         it('Atualiza uma categoria', async () => {
-            const { body: category } = await adminRequest()
-                .post('/category')
+            
+            const { body: category } = await adminRequest(request(app.getHttpServer()).post('/category'))
                 .send(category1)
             
-            const res = await adminRequest()
-                .patch(`/category/${category.id}`)
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/category/${category.id}`))
                 .send({
                     name: 'New Category Name'
                 })
@@ -284,8 +276,7 @@ describe('Category (e2e)', () => {
             )
 
             // Validando se foi atualizado
-            const get_res = await userRequest()
-                .get(`/category/${category.id}`)
+            const get_res = await userRequest(request(app.getHttpServer()).get(`/category/${category.id}`))
                 .expect(200)
             
             expect(get_res.body).toStrictEqual({
@@ -295,7 +286,7 @@ describe('Category (e2e)', () => {
         })
 
         it('Tenta acessar sem token', async() => {
-            const res = await guestRequest()
+            const res = await request(app.getHttpServer())
                 .patch('/category/1')
                 .expect(401)
             
@@ -303,28 +294,24 @@ describe('Category (e2e)', () => {
         })
 
         it('Tenta acessar como usuário', async() => {
-            const res = await userRequest()
-                .patch('/category/1')
+            const res = await userRequest(request(app.getHttpServer()).patch('/category/1'))
                 .expect(401)
             
             validateError(res.body, 401)
         })
 
         it('Tenta atualizar categoria que não existe', async() => {
-            const res = await adminRequest()
-                .patch('/category/200')
+            const res = await adminRequest(request(app.getHttpServer()).patch('/category/200'))
                 .expect(404)
             
             validateError(res.body, 404)
         })
 
         it('Passa informações que não existem', async() => {
-            const { body: category } = await adminRequest()
-                .post('/category')
+            const { body: category } = await adminRequest(request(app.getHttpServer()).post('/category'))
                 .send(category1)
             
-            const res = await adminRequest()
-                .patch(`/category/${category.id}`)
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/category/${category.id}`))
                 .send({
                     not_exists_prop: 'Foo Value'
                 })
@@ -336,12 +323,10 @@ describe('Category (e2e)', () => {
 
     describe('(DELETE) /category/:id', () => {
         it('Deleta uma categoria', async () => {
-            const { body: category } = await adminRequest()
-                .post('/category')
+            const { body: category } = await adminRequest(request(app.getHttpServer()).post('/category'))
                 .send(category1)
             
-            const res = await adminRequest()
-                .delete(`/category/${category.id}`)
+            const res = await adminRequest(request(app.getHttpServer()).delete(`/category/${category.id}`))
                 .expect(200)
             
             expect(res.body).toEqual(
@@ -357,15 +342,14 @@ describe('Category (e2e)', () => {
         })
 
         it('Tenta acessar com token de usuário', async() => {
-            const res = await userRequest()
-                .delete(`/category/1`)
+            const res = await userRequest(request(app.getHttpServer()).delete(`/category/1`))
                 .expect(401)
             
             validateError(res.body, 401)
         })
 
         it('Tenta acessar sem token', async () => {
-            const res = await guestRequest()
+            const res = await request(app.getHttpServer())
                 .delete(`/category/1`)
                 .expect(401)
             
@@ -373,8 +357,7 @@ describe('Category (e2e)', () => {
         })
 
         it('Tenta deletar categoria que não existe', async () => {
-            const res = await adminRequest()
-                .delete('/category/200')
+            const res = await adminRequest(request(app.getHttpServer()).delete('/category/200'))
                 .expect(404)
             
             validateError(res.body, 404)
