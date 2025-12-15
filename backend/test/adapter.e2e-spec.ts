@@ -161,7 +161,7 @@ describe('Adapter (e2e)', () => {
                 .send(firstTypeAdapter)
                 .expect(201)
             
-            const get_res = await userRequest(request(app.getHttpServer()).get(`/category/${res.body.id}`))
+            const get_res = await userRequest(request(app.getHttpServer()).get(`/adapter/${res.body.id}`))
                 .expect(200)
             expect(get_res.body).toStrictEqual({
                 id: res.body.id,
@@ -190,10 +190,10 @@ describe('Adapter (e2e)', () => {
                 limit: 1
             }
             
-            // Registrando todas as categorias
+            // Registrando todos os adapters
             let adapters = [firstTypeAdapter, secondTypeAdapter]
             for (let adapter of adapters) {
-                await userRequest(request(app.getHttpServer()).post('/adapter'))
+                await adminRequest(request(app.getHttpServer()).post('/adapter'))
                     .send(adapter)
                     .expect(201)
             }
@@ -212,7 +212,7 @@ describe('Adapter (e2e)', () => {
                 expect.objectContaining({
                     page: paginationInfo.page,
                     limit: paginationInfo.limit,
-                    total: 4,
+                    total: 2,
                     totalPages: 2
                 })
             )
@@ -260,7 +260,7 @@ describe('Adapter (e2e)', () => {
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 200,
-                    category: {
+                    adapter: {
                         id: adapter.id,
                         ...firstTypeAdapter,
                         sep: 'test-sep'
@@ -327,7 +327,7 @@ describe('Adapter (e2e)', () => {
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 200,
-                    category: {
+                    adapter: {
                         id: adapter.id,
                         ...firstTypeAdapter
                     }
