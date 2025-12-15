@@ -1,9 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
+import { INestApplication } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import request from 'supertest'
 import { App } from 'supertest/types'
-import { AppModule } from '../src/app.module'
 import { Test as SupertestTest } from 'supertest'
 
 /* REPOSITÓRIOS */
