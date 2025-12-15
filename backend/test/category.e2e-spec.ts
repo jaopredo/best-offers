@@ -11,6 +11,7 @@ import { DataSource } from 'typeorm'
 /* HELPERS */
 import { getUserAuthToken, getAdminAuthToken } from './helpers/auth'
 import { seedAdmin } from './helpers/seed-admin'
+import e2eSetup from './e2e.setup'
 
 describe('Category (e2e)', () => {
     let app: INestApplication<App>
@@ -20,37 +21,15 @@ describe('Category (e2e)', () => {
     let adminToken: string
 
     beforeAll(async () => {
-        const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [
-            ConfigModule.forRoot({
-                envFilePath: ['.env.test.local'],
-            }),
-            AppModule
-        ],
-        }).compile()
-
-        app = moduleFixture.createNestApplication()
-
-        app.useGlobalPipes(
-            new ValidationPipe({
-                whitelist: true,
-                forbidNonWhitelisted: true,
-                transform: true,
-                transformOptions: {
-                    enableImplicitConversion: true,
-                },
-            })
-        )
-
-        await app.init()
-
+        const setup = await e2eSetup()
+        app = setup.app
+        dataSource = setup.dataSource
         configService = app.get(ConfigService)
     })
 
     beforeEach(async () => {
         // Resetando todas as informações no banco de teste para realizar os testes
         // seguidamente quantas vezes eu quiser
-        dataSource = app.get<DataSource>(DataSource)
         const tableNames = dataSource.entityMetadatas
             .map(entity => `"${entity.tableName}"`)
             .join(', ')

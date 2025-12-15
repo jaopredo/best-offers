@@ -11,6 +11,7 @@ import { DataSource } from 'typeorm'
 /* HELPERS */
 import { getUserAuthToken, getAdminAuthToken } from './helpers/auth'
 import { seedAdmin } from './helpers/seed-admin'
+import e2eSetup from './e2e.setup'
 
 describe('Adapter (e2e)', () => {
     let app: INestApplication<App>
@@ -20,36 +21,10 @@ describe('Adapter (e2e)', () => {
     let adminToken: string
 
     beforeAll(async () => {
-        // Inicializando o aplicativo
-        const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [
-            ConfigModule.forRoot({
-                envFilePath: ['.env.test.local'],
-            }),
-            AppModule
-        ],
-        }).compile()
-
-        app = moduleFixture.createNestApplication()
-
-        app.useGlobalPipes(
-            new ValidationPipe({
-                whitelist: true,
-                forbidNonWhitelisted: true,
-                transform: true,
-                transformOptions: {
-                    enableImplicitConversion: true,
-                },
-            })
-        )
-
-        await app.init()
-
+        const setup = await e2eSetup()
+        app = setup.app
+        dataSource = setup.dataSource
         configService = app.get(ConfigService)
-
-        dataSource = app.get(DataSource)
-        
-        await dataSource.synchronize()
     })
 
     beforeEach(async () => {

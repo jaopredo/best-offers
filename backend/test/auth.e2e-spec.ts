@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config'
 import request from 'supertest'
 import { App } from 'supertest/types'
 import { AppModule } from '../src/app.module'
+import e2eSetup from './e2e.setup'
 
 /* REPOSITÓRIOS */
 import { DataSource } from 'typeorm'
@@ -13,35 +14,14 @@ describe('Authentication (e2e)', () => {
     let dataSource: DataSource
 
     beforeAll(async () => {
-        const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [
-            ConfigModule.forRoot({
-            envFilePath: ['.env.test.local'],
-            }),
-            AppModule
-        ],
-        }).compile()
-
-        app = moduleFixture.createNestApplication()
-
-        app.useGlobalPipes(
-            new ValidationPipe({
-                whitelist: true,
-                forbidNonWhitelisted: true,
-                transform: true,
-                transformOptions: {
-                    enableImplicitConversion: true,
-                },
-            })
-        )
-
-        await app.init()
+        const setup = await e2eSetup()
+        app = setup.app
+        dataSource = setup.dataSource
     })
 
     beforeEach(async () => {
         // Resetando todas as informações no banco de teste para realizar os testes
         // seguidamente quantas vezes eu quiser
-        dataSource = app.get<DataSource>(DataSource)
         const tableNames = dataSource.entityMetadatas
             .map(entity => `"${entity.tableName}"`)
             .join(', ')
