@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import request from 'supertest'
 import { App } from 'supertest/types'
 import { AppModule } from '../src/app.module'
+import { Test as SupertestTest } from 'supertest'
 
 /* REPOSITÓRIOS */
 import { DataSource } from 'typeorm'
@@ -71,8 +72,8 @@ describe('Category (e2e)', () => {
         )
     }
 
-    const userRequest = (req) => req.set('Authorization', `Bearer ${userToken}`)
-    const adminRequest = (req) => req.set('Authorization', `Bearer ${adminToken}`)
+    const userRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${userToken}`)
+    const adminRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${adminToken}`)
 
 
     describe('(POST) /category', () => {

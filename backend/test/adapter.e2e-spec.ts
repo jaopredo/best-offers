@@ -1,9 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
+import { INestApplication } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import request from 'supertest'
+import { Test as SupertestTest } from 'supertest'
 import { App } from 'supertest/types'
-import { AppModule } from '../src/app.module'
 
 /* REPOSITÓRIOS */
 import { DataSource } from 'typeorm'
@@ -59,8 +58,8 @@ describe('Adapter (e2e)', () => {
         )
     }
 
-    const userRequest = (req) => req.set('Authorization', `Bearer ${userToken}`)
-    const adminRequest = (req) => req.set('Authorization', `Bearer ${adminToken}`)
+    const userRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${userToken}`)
+    const adminRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${adminToken}`)
 
     // O primeiro passa o `searchParameter` como parâmetro da Query
     const firstTypeAdapter = {
@@ -87,6 +86,7 @@ describe('Adapter (e2e)', () => {
         itemSellerClassName: 'item-seller'
     }
 
+    
     describe('(POST) /adapter', () => {
         it('Registra vários tipos de adapter', async () => {
             const resFirstAdapter = await adminRequest(request(app.getHttpServer()).post('/adapter'))
@@ -336,7 +336,7 @@ describe('Adapter (e2e)', () => {
 
             // Validando se deletou o personagem
             const getRes = await adminRequest(request(app.getHttpServer()).get(`/adapter/${adapter.id}`))
-                .validate(404)
+                .expect(404)
             validateError(getRes.body, 404)
         })
 

@@ -1,9 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
+import { INestApplication } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import request from 'supertest'
 import { App } from 'supertest/types'
-import { AppModule } from '../src/app.module'
+import { Test as SupertestTest } from 'supertest'
 
 /* REPOSITÓRIOS */
 import { DataSource } from 'typeorm'
@@ -59,8 +58,8 @@ describe('Font (e2e)', () => {
         )
     }
 
-    const userRequest = (req) => req.set('Authorization', `Bearer ${userToken}`)
-    const adminRequest = (req) => req.set('Authorization', `Bearer ${adminToken}`)
+    const userRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${userToken}`)
+    const adminRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${adminToken}`)
 
     // O primeiro passa o `searchParameter` como parâmetro da Query
     const helperAdapter = {
@@ -418,11 +417,11 @@ describe('Font (e2e)', () => {
 
             // Validando se deletou a fonte e o adapter
             const getFontRes = await adminRequest(request(app.getHttpServer()).get(`/font/${regisRes.font.id}`))
-                .validate(404)
+                .expect(404)
             validateError(getFontRes.body, 404)
 
             const getAdapterRes = await adminRequest(request(app.getHttpServer()).get(`/adapter/${regisRes.adapter.id}`))
-                .validate(404)
+                .expect(404)
             validateError(getAdapterRes.body, 404)
         })
 
