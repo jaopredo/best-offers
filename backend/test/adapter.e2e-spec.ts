@@ -132,6 +132,234 @@ describe('Adapter (e2e)', () => {
             validateError(res.body, 401)
         })
 
-        
+        it('Passa informações que não existem', async () => {
+            const resWrongProps = await adminRequest(request(app.getHttpServer()).post('/adapter'))
+                .send({
+                    notExistingProp1: 'foo prop 1',
+                    notExistingProp2: 'foo prop 2',
+                })
+                .expect(400)
+            
+            validateError(resWrongProps.body, 400)
+
+
+            const resMissingFields = await adminRequest(request(app.getHttpServer()).post('/adapter'))
+                .send({
+                    ...firstTypeAdapter,
+                    itemURLClassName: undefined,
+                    itemContainerClassName: undefined,
+                })
+                .expect(400)
+            
+            validateError(resMissingFields.body, 400)
+        })
+    })
+
+    describe('(GET) /adapter/:id', () => {
+        it('Pegar um adapter específica', async () => {
+            const res = await userRequest(request(app.getHttpServer()).post('/adapter'))
+                .send(firstTypeAdapter)
+                .expect(201)
+            
+            const get_res = await userRequest(request(app.getHttpServer()).get(`/category/${res.body.id}`))
+                .expect(200)
+            expect(get_res.body).toStrictEqual({
+                id: res.body.id,
+                ...firstTypeAdapter
+            })
+        })
+
+        it('Tenta requisição sem token', async () => {
+            const res = await request(app.getHttpServer())
+                .get('/adapter/1')
+                .expect(401)
+            validateError(res.body, 401)
+        })
+
+        it('Tenta pegar adapter que não existe', async () => {
+            const res = await userRequest(request(app.getHttpServer()).get(`/adapter/200`))
+                .expect(404)
+            validateError(res.body, 404)
+        })
+    })
+
+    describe('(GET) /adapter', () => {
+        it('Pegar vários adapters (Com paginação)', async () => {
+            const paginationInfo = {
+                page: 1,
+                limit: 1
+            }
+            
+            // Registrando todas as categorias
+            let adapters = [firstTypeAdapter, secondTypeAdapter]
+            for (let adapter of adapters) {
+                await userRequest(request(app.getHttpServer()).post('/adapter'))
+                    .send(adapter)
+                    .expect(201)
+            }
+            
+            // Checando a resposta do GET
+            const res = await userRequest(
+                request(app.getHttpServer())
+                .get(`/adapter?page=${paginationInfo.page}&limit=${paginationInfo.limit}`)
+            )
+                .expect(200)
+            
+            expect(Array.isArray(res.body.data)).toBe(true)
+            expect(res.body.data).toHaveLength(2)
+
+            expect(res.body.meta).toEqual(
+                expect.objectContaining({
+                    page: paginationInfo.page,
+                    limit: paginationInfo.limit,
+                    total: 4,
+                    totalPages: 2
+                })
+            )
+        })
+
+        it('Pegar vários adapters (Com banco vazio)', async () => {
+            const res = await userRequest(request(app.getHttpServer()).get(`/adapter`))
+                .expect(200)
+            
+            expect(Array.isArray(res.body.data)).toBe(true)
+            expect(res.body.data).toEqual([])
+
+            expect(res.body.meta).toEqual(
+                expect.objectContaining({
+                    page: 1,
+                    limit: 10,
+                    total: 0,
+                    totalPages: 1
+                })
+            )
+        })
+
+        it('Tenta pegar sem passar um token', async () => {
+            const res = await request(app.getHttpServer())
+                .get('/adapter')
+                .expect(401)
+            
+            validateError(res.body, 401)
+        })
+    })
+
+    describe('(PATCH) /adapter/:id', () => {
+        it('Atualiza um adapter', async () => {
+            const { body: adapter } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
+                .send(firstTypeAdapter)
+            
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/adapter/${adapter.id}`))
+                .send({
+                    sep: 'test-sep'
+                })
+                .expect(200)
+            
+            // Validando o corpo da requisição
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    category: {
+                        id: adapter.id,
+                        ...firstTypeAdapter,
+                        sep: 'test-sep'
+                    }
+                })
+            )
+
+            // Validando se foi atualizado
+            const get_res = await userRequest(request(app.getHttpServer()).get(`/adapter/${adapter.id}`))
+                .expect(200)
+            
+            expect(get_res.body).toStrictEqual({
+                id: adapter.id,
+                ...firstTypeAdapter,
+                name: 'test-sep'
+            })
+        })
+
+        it('Tenta acessar sem token', async() => {
+            const res = await request(app.getHttpServer())
+                .patch('/adapter/1')
+                .expect(401)
+            
+            validateError(res.body, 401)
+        })
+
+        it('Tenta acessar como usuário', async() => {
+            const res = await userRequest(request(app.getHttpServer()).patch('/adapter/1'))
+                .expect(401)
+            
+            validateError(res.body, 401)
+        })
+
+        it('Tenta atualizar adapter que não existe', async() => {
+            const res = await adminRequest(request(app.getHttpServer()).patch('/adapter/200'))
+                .expect(404)
+            
+            validateError(res.body, 404)
+        })
+
+        it('Passa informações que não existem', async() => {
+            const { body: adapter } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
+                .send(firstTypeAdapter)
+            
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/adapter/${adapter.id}`))
+                .send({
+                    not_exists_prop: 'Foo Value'
+                })
+                .expect(400)
+            
+            validateError(res.body, 400)
+        })
+    })
+
+    describe('(DELETE) /adapter/:id', () => {
+        it('Deleta um adapter', async () => {
+            const { body: adapter } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
+                .send(firstTypeAdapter)
+            
+            const res = await adminRequest(request(app.getHttpServer()).delete(`/adapter/${adapter.id}`))
+                .expect(200)
+            
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    category: {
+                        id: adapter.id,
+                        ...firstTypeAdapter
+                    }
+                })
+            )
+
+            // Validando se deletou o personagem
+            const getRes = await adminRequest(request(app.getHttpServer()).get(`/adapter/${adapter.id}`))
+                .validate(404)
+            validateError(getRes.body, 404)
+        })
+
+        it('Tenta acessar com token de usuário', async() => {
+            const res = await userRequest(request(app.getHttpServer()).delete(`/adapter/1`))
+                .expect(401)
+            
+            validateError(res.body, 401)
+        })
+
+        it('Tenta acessar sem token', async () => {
+            const res = await request(app.getHttpServer())
+                .delete(`/adapter/1`)
+                .expect(401)
+            
+            validateError(res.body, 401)
+        })
+
+        it('Tenta deletar adapter que não existe', async () => {
+            const res = await adminRequest(request(app.getHttpServer()).delete('/adapter/200'))
+                .expect(404)
+            
+            validateError(res.body, 404)
+        })
     })
 })

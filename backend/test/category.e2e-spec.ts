@@ -196,14 +196,6 @@ describe('Category (e2e)', () => {
         })
 
         it('Pegar várias categorias (Com banco vazio)', async () => {
-            // Registrando todas as categorias
-            let categories = [category1, category2, category3, category4]
-            for (let category of categories) {
-                await userRequest(request(app.getHttpServer()).post('/category'))
-                    .send(category)
-                    .expect(201)
-            }
-            
             // Checando a resposta do GET
             const res = await userRequest(request(app.getHttpServer()).get(`/category`))
                 .expect(200)
@@ -318,6 +310,11 @@ describe('Category (e2e)', () => {
                     }
                 })
             )
+
+            // Validando se deletou
+            const getRes = await adminRequest(request(app.getHttpServer()).get(`/category/${category.id}`))
+                .expect(404)
+            validateError(getRes.body, 404)
         })
 
         it('Tenta acessar com token de usuário', async() => {
