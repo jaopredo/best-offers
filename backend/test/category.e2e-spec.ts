@@ -169,7 +169,7 @@ describe('Category (e2e)', () => {
             // Registrando todas as categorias
             let categories = [category1, category2, category3, category4]
             for (let category of categories) {
-                await userRequest(request(app.getHttpServer()).post('/category'))
+                await adminRequest(request(app.getHttpServer()).post('/category'))
                     .send(category)
                     .expect(201)
             }

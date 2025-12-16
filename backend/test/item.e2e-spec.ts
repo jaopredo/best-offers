@@ -22,6 +22,12 @@ describe('Item (e2e)', () => {
     let category: Record<string, unknown>
     let font: Record<string, unknown>
     let adapter: Record<string, unknown>
+    let item: Record<string, unknown>
+
+    let category2: Record<string, unknown>
+    let font2: Record<string, unknown>
+    let adapter2: Record<string, unknown>
+    let item2: Record<string, unknown>
 
 
     /* OBJETOS QUE SERÃO UTILIZADOS DURANTE OS TESTES */
@@ -36,20 +42,42 @@ describe('Item (e2e)', () => {
         itemPriceClassName: 'item-price',
         itemSellerClassName: 'item-seller'
     }
-
     const fontBody = {
         url: 'http://mock-test.foo.com',
         name: 'Foo'
     }
-
     const categoryBody = {
         name: 'Foo Category'
     }
-
     const itemBody = {
         name: "Kit de chaves de fenda",
         price: 32.84,
         url: "http://foo.com.br/kit-chave-de-fenda",
+        seller: "Vendedor",
+    }
+
+    const adapterBody2 = {
+        searchURL: 'http://mock-site-2/search',
+        searchParameter: 'q',
+        sep: '+',
+
+        itemURLClassName: 'product-link',
+        itemContainerClassName: 'product-card',
+        itemNameClassName: 'product-title',
+        itemPriceClassName: 'product-price',
+        itemSellerClassName: 'product-seller'
+    }
+    const fontBody2 = {
+        url: 'http://mock-test.bar.com',
+        name: 'Bar'
+    }
+    const categoryBody2 = {
+        name: 'Bar Category'
+    }
+    const itemBody2 = {
+        name: "Papel Higiênico",
+        price: 9.10,
+        url: "http://mock-test.bar.com/papel+higienico",
         seller: "Vendedor",
     }
 
@@ -60,11 +88,13 @@ describe('Item (e2e)', () => {
     /**
      * Recebe uma categoria, uma fonte e um adapter e registra no banco de dados
      * @param category Categoria a ser registrada
+     * @param item Item a ser registrado
      * @param font Fonte a ser registrada
      * @param adapter Adapter a ser registrado
      * @returns Retorna um objeto contendo cada objeto retornado pelas requisições
      */
-    async function registerCategoryFontAdapter(
+    async function registerItemCategoryFontAdapter(
+        item: Record<string, unknown>,
         category: Record<string, unknown>,
         font: Record<string, unknown>,
         adapter: Record<string, unknown>
@@ -84,8 +114,17 @@ describe('Item (e2e)', () => {
         const { body: { category: resCategory } } = await adminRequest(request(app.getHttpServer()).post('/category'))
             .send(category)
         
+        // Registrando o item
+        const { body: { item: resItem } } = await adminRequest(request(app.getHttpServer()).post('/item'))
+            .send({
+                ...item,
+                fontId: font.id,
+                categoryId: category.id
+            })
+            .expect(201)
+        
         // Retorno um objeto tanto com a fonte quanto com o adapter
-        return { font: resFont, category: resCategory, adapter: resAdapter }
+        return { font: resFont, category: resCategory, adapter: resAdapter, item: resItem }
     }
 
     beforeAll(async () => {
@@ -116,15 +155,28 @@ describe('Item (e2e)', () => {
         /**
          * Antes de todo teste, vou iniciar uma categoria, uma fonte e um adapter
          */
-        const registeredItemsResponse = await registerCategoryFontAdapter(
+        const registeredItemsResponse1 = await registerItemCategoryFontAdapter(
+            itemBody,
             categoryBody,
             fontBody,
             adapterBody
         )
+        const registeredItemsResponse2 = await registerItemCategoryFontAdapter(
+            itemBody2,
+            categoryBody2,
+            fontBody2,
+            adapterBody2
+        )
 
-        category = registeredItemsResponse.category
-        font = registeredItemsResponse.font
-        adapter = registeredItemsResponse.adapter
+        category = registeredItemsResponse1.category
+        font = registeredItemsResponse1.font
+        adapter = registeredItemsResponse1.adapter
+        item = registeredItemsResponse1.item
+
+        category2 = registeredItemsResponse2.category
+        font2 = registeredItemsResponse2.font
+        adapter2 = registeredItemsResponse2.adapter
+        item2 = registeredItemsResponse2.item
     })
 
     afterAll(async () => {
@@ -224,6 +276,239 @@ describe('Item (e2e)', () => {
                 })
                 .expect(404)
             validateError(res.body, 404)
+        })
+    })
+
+    describe('(GET) /item/:id', () => {
+        it('Pegar um item específico', async () => {
+            const get_res = await userRequest(request(app.getHttpServer()).get(`/item/${item.id}`))
+                .expect(200)
+            expect(get_res.body).toStrictEqual(item)
+        })
+
+        it('Tenta requisição sem token', async () => {
+            const res = await request(app.getHttpServer())
+                .get('/category/1')
+                .expect(401)
+            validateError(res.body, 401)
+        })
+
+        it('Tenta pegar item que não existe', async () => {
+            const res = await userRequest(request(app.getHttpServer()).get(`/item/200`))
+                .expect(404)
+            validateError(res.body, 404)
+        })
+    })
+
+    describe('(GET) /item', () => {
+        it('Pegar vários itens (Com paginação)', async () => {
+            const paginationInfo = {
+                page: 1,
+                limit: 2
+            }
+            
+            // Registrando todos os itens
+            let items = [itemBody, itemBody, itemBody]
+            for (let item of items) {
+                await adminRequest(request(app.getHttpServer()).post('/item'))
+                    .send({
+                        ...item,
+                        categoryId: category.id,
+                        fontId: font.id
+                    })
+                    .expect(201)
+            }
+            
+            // Checando a resposta do GET
+            const res = await userRequest(
+                request(app.getHttpServer())
+                .get(`/item?page=${paginationInfo.page}&limit=${paginationInfo.limit}`)
+            )
+                .expect(200)
+            
+            expect(Array.isArray(res.body.data)).toBe(true)
+            expect(res.body.data).toHaveLength(2)
+
+            expect(res.body.meta).toEqual(
+                expect.objectContaining({
+                    page: paginationInfo.page,
+                    limit: paginationInfo.limit,
+                    total: 4,
+                    totalPages: 2
+                })
+            )
+        })
+
+        it('Pegar vários itens (Com banco vazio)', async () => {
+            // Checando a resposta do GET
+            const res = await userRequest(request(app.getHttpServer()).get(`/item`))
+                .expect(200)
+            
+            expect(Array.isArray(res.body.data)).toBe(true)
+            expect(res.body.data).toEqual([])
+
+            expect(res.body.meta).toEqual(
+                expect.objectContaining({
+                    page: 1,
+                    limit: 10,
+                    total: 0,
+                    totalPages: 1
+                })
+            )
+        })
+
+        it('Tenta pegar sem passar um token', async () => {
+            const res = await request(app.getHttpServer())
+                .get('/item')
+                .expect(401)
+            
+            validateError(res.body, 401)
+        })
+    })
+
+    describe('(PATCH) /item', () => {
+        it('Atualiza um item normalmente', async () => {
+            // Atualiza a fonte
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/item/${item.id}`))
+                .send({
+                    name: 'Mock Item'
+                })
+                .expect(200)
+            
+            // Validando o corpo da requisição
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    item: {
+                        ...item,
+                        name: 'Mock Item'
+                    }
+                })
+            )
+
+            // Validando se foi atualizado
+            const get_res = await userRequest(request(app.getHttpServer()).get(`/item/${item.id}`))
+                .expect(200)
+            
+            expect(get_res.body).toStrictEqual({
+                ...item,
+                name: 'Mock Test'
+            })
+        })
+
+        it('Troca a fonte do item', async () => {
+            // Atualiza a fonte do item
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/item/${item.id}`))
+                .send({
+                    fontId: font2.id
+                })
+                .expect(200)
+            
+            // Validando o corpo da requisição
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    item: {
+                        ...item,
+                        font: {
+                            ...font2,
+                            adapter: undefined
+                        }
+                    }
+                })
+            )
+
+            // Validando se foi atualizado
+            const getRes = await userRequest(request(app.getHttpServer()).get(`/item/${item.id}`))
+                .expect(200)
+            
+            expect(getRes.body).toStrictEqual({
+                ...item,
+                font: {
+                    ...font2,
+                    adapter: undefined
+                }
+            })
+        })
+
+        it('Troca a categoria do item', async () => {
+            // Atualiza a fonte do item
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/item/${item.id}`))
+                .send({
+                    categoryId: category2.id
+                })
+                .expect(200)
+            
+            // Validando o corpo da requisição
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    item: {
+                        ...item,
+                        category: category2
+                    }
+                })
+            )
+
+            // Validando se foi atualizado
+            const getRes = await userRequest(request(app.getHttpServer()).get(`/item/${item.id}`))
+                .expect(200)
+            
+            expect(getRes.body).toStrictEqual({
+                ...item,
+                category: category2
+            })
+        })
+
+        it('Tenta acessar sem token', async() => {
+            const res = await request(app.getHttpServer())
+                .patch('/item/1')
+                .expect(401)
+            
+            validateError(res.body, 401)
+        })
+
+        it('Tenta acessar como usuário', async() => {
+            const res = await userRequest(request(app.getHttpServer()).patch('/item/1'))
+                .expect(401)
+            
+            validateError(res.body, 401)
+        })
+
+        it('Tenta atualizar item que não existe', async() => {
+            const res = await adminRequest(request(app.getHttpServer()).patch('/item/200'))
+                .expect(404)
+            
+            validateError(res.body, 404)
+        })
+
+        it('Passa informações que não existem', async() => {
+            const unknownPropRes = await adminRequest(request(app.getHttpServer()).patch(`/item/${item.id}`))
+                .send({
+                    not_exists_prop: 'Foo Value'
+                })
+                .expect(400)
+            
+            validateError(unknownPropRes.body, 400)
+
+            const notExistingCategoryRes = await adminRequest(request(app.getHttpServer()).patch(`/item/${item.id}`))
+                .send({
+                    categoryId: 2000
+                })
+                .expect(404)
+            
+            validateError(notExistingCategoryRes.body, 404)
+
+            const notExistingFontRes = await adminRequest(request(app.getHttpServer()).patch(`/item/${item.id}`))
+                .send({
+                    fontId: 2000
+                })
+                .expect(404)
+            
+            validateError(notExistingFontRes.body, 404)
         })
     })
 })
