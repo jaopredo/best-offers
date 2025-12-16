@@ -35,7 +35,13 @@ export class CategoryController {
     @Post()
     @Roles(['admin'])
     async create(@Body() category: CategoryPostDto) {
-        throw new NotImplementedException()
+        const createdCategory = await this.categoryService.create(category)
+
+        return {
+            message: 'Categoria criada com sucesso',
+            statusCode: 201,
+            category: createdCategory
+        }
     }
 
     @Get('/:id')

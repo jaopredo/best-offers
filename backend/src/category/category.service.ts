@@ -16,6 +16,8 @@ export class CategoryService {
     ) {}
 
     async create(category: CategoryPostDto) {
+        await this.categoryRepository.save(category)
+        return category
     }
 
     // Fazendo overloads para a tipagem
