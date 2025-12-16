@@ -21,10 +21,17 @@ export class CategoryService {
     }
 
     // Fazendo overloads para a tipagem
-    // async get(category: { id: number }): Promise<Category | null>
-    // async get(category: Partial<Omit<Category, "id">>): Promise<Category[]>
-    // async get(category: Partial<Category>) {
-    // }
+    async get(category: { id: number }): Promise<Category | null>
+    async get(category: Partial<Omit<Category, "id">>): Promise<Category[]>
+    async get(category: Partial<Category>) {
+        if (category.id) {
+            return await this.categoryRepository.findOneBy({
+                id: category.id
+            })
+        } else {
+            return await this.categoryRepository.findBy(category)
+        }
+    }
 
     async update(id: number, category: CategoryPostDto) {
     }

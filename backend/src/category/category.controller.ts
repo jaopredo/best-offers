@@ -46,7 +46,13 @@ export class CategoryController {
 
     @Get('/:id')
     async get(@Param('id') id: string) {
-        throw new NotImplementedException()
+        const foundCategory = await this.categoryService.get({
+            id: Number(id)
+        })
+
+        if (!foundCategory) throw new NotFoundException('Categoria solicitada não encontrada')
+
+        return foundCategory
     }
 
     @Get()
