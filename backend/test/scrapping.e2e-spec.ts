@@ -255,7 +255,7 @@ describe('Authentication (e2e)', () => {
     })
 
     describe('(GET) /job', () => {
-        it('Pegar vários adapters (Com paginação)', async () => {
+        it('Pegar vários jobs (Com paginação)', async () => {
             const paginationInfo = {
                 page: 1,
                 limit: 1
@@ -264,7 +264,7 @@ describe('Authentication (e2e)', () => {
             // Checando a resposta do GET
             const res = await userRequest(
                 request(app.getHttpServer())
-                .get(`/adapter?page=${paginationInfo.page}&limit=${paginationInfo.limit}`)
+                .get(`/job?page=${paginationInfo.page}&limit=${paginationInfo.limit}`)
             )
                 .expect(200)
             
@@ -281,8 +281,8 @@ describe('Authentication (e2e)', () => {
             )
         })
 
-        it('Pegar vários adapters (Com banco vazio)', async () => {
-            const res = await userRequest(request(app.getHttpServer()).get(`/adapter`))
+        it('Pegar vários jobs (Com banco vazio)', async () => {
+            const res = await userRequest(request(app.getHttpServer()).get(`/job`))
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
@@ -300,10 +300,48 @@ describe('Authentication (e2e)', () => {
 
         it('Tenta pegar sem passar um token', async () => {
             const res = await request(app.getHttpServer())
-                .get('/adapter')
+                .get('/job')
                 .expect(401)
             
             validateError(res.body, 401)
+        })
+    })
+
+    describe('(DELETE) /job/:id', () => {
+        it('Deleta um job', async () => {
+            const res = await adminRequest(request(app.getHttpServer()).delete(`/job/${job1.id}`))
+                .expect(200)
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    job: job1
+                })
+            )
+
+            // Validando que deletou o job do banco
+            const getRes = await adminRequest(request(app.getHttpServer()).get(`/job/${job1.id}`))
+                .expect(404)
+            validateError(getRes.body, 404)
+        })
+
+        it('Tenta deletar um job que não existe', async () => {
+            const res = await adminRequest(request(app.getHttpServer()).delete('/job/200'))
+                .expect(404)
+            validateError(res.body, 404)
+        })
+
+        it('Tenta acessar como usuário', async () => {
+            const res = await userRequest(request(app.getHttpServer()).delete('/job/1'))
+                .expect(404)
+            validateError(res.body, 404)
+        })
+
+        it('Tenta acessar sem token', async () => {
+            const res = await request(app.getHttpServer())
+                .delete('/job/1')
+                .expect(404)
+            validateError(res.body, 404)
         })
     })
 })
