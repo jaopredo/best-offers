@@ -12,11 +12,13 @@ import { Font } from 'database/models/font'
 import { Adapter } from 'database/models/adapter'
 import { Category } from 'database/models/category'
 import { Item } from 'database/models/item'
+import { AdapterModule } from './adapter/adapter.module'
 
 @Module({
     imports: [
         AuthModule,
         CategoryModule,
+        AdapterModule,
         ConfigModule.forRoot({
             isGlobal: true
         }),
