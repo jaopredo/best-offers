@@ -7,8 +7,10 @@ import {
     NotFoundException,
     NotImplementedException,
     Param,
+    ParseIntPipe,
     Patch,
     Post,
+    Query,
     UseGuards
 } from "@nestjs/common"
 
@@ -19,7 +21,7 @@ import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
 import { Roles } from "src/decorators/roles.decorator"
 
 /* DTO */
-import { AdapterDto } from "types/adapter/adapter.dto"
+import { AdapterDto, AdapterPaginationQueryDto } from "types/adapter/adapter.dto"
 
 /* SERVIÇOS */
 import { AdapterService } from "./adapter.service"
@@ -45,13 +47,32 @@ export class AdapterController {
     }
 
     @Get('/:id')
-    async get(@Param('id') id: string) {
-        throw new NotImplementedException()
+    async get(@Param('id', ParseIntPipe) id: number) {
+        const foundAdapter = await this.adapterService.get(id)
+
+        if (!foundAdapter) throw new NotFoundException('Adapter especificado não encontrado')
+        
+        return foundAdapter
     }
 
     @Get()
-    async getAll() {
-        throw new NotImplementedException()
+    async getAll(@Query() query: AdapterPaginationQueryDto) {
+        const {
+            adapters,
+            count
+        } = await this.adapterService.getAll(query.limit, query.page, {
+            
+        })
+
+        return {
+            data: adapters,
+            meta: {
+                page: query.page,
+                limit: query.limit,
+                total: count,
+                totalPages: Math.ceil(count / query.limit)
+            }
+        }
     }
 
     @Patch('/:id')
