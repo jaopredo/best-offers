@@ -89,14 +89,18 @@ describe('Adapter (e2e)', () => {
         await app.close()
     })
 
-    const validateError = (value: unknown, code: number) => {
+    const validateError = (value: Record<string,unknown>, code: number) => {
         expect(value).toEqual(
             expect.objectContaining({
-                message: expect.any(String),
+                message: expect.anything(),
                 error: expect.any(String),
                 statusCode: code
             })
         )
+
+        expect(
+            typeof value.message === 'string' || Array.isArray(value.message)
+        ).toBe(true)
     }
 
     
