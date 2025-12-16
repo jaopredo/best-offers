@@ -19,6 +19,27 @@ describe('Category (e2e)', () => {
     let userToken: string
     let adminToken: string
 
+    let category1: Record<string, unknown>
+    let category2: Record<string, unknown>
+    let category3: Record<string, unknown>
+    let category4: Record<string, unknown>
+
+    const category1Body = {
+        name: 'Categoria 1'
+    }
+    const category2Body = {
+        name: 'Categoria 2'
+    }
+    const category3Body = {
+        name: 'Categoria 3'
+    }
+    const category4Body = {
+        name: 'Categoria 4'
+    }
+
+    const userRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${userToken}`)
+    const adminRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${adminToken}`)
+
     beforeAll(async () => {
         const setup = await e2eSetup()
         app = setup.app
@@ -41,24 +62,32 @@ describe('Category (e2e)', () => {
         userToken = await getUserAuthToken(app.getHttpServer())
         await seedAdmin(dataSource, configService)
         adminToken = await getAdminAuthToken(app.getHttpServer())
+
+        // Registrando todas as categorias
+        const { body: { category: category1Res } } = await adminRequest(request(app.getHttpServer()).post('/category'))
+            .send(category1Body)
+            .expect(201)
+        category1 = category1Res
+
+        const { body: { category: category2Res } } = await adminRequest(request(app.getHttpServer()).post('/category'))
+            .send(category2Body)
+            .expect(201)
+        category2 = category2Res
+        
+        const { body: { category: category3Res } } = await adminRequest(request(app.getHttpServer()).post('/category'))
+            .send(category3Body)
+            .expect(201)
+        category3 = category3Res
+        
+        const { body: { category: category4Res } } = await adminRequest(request(app.getHttpServer()).post('/category'))
+            .send(category4Body)
+            .expect(201)
+        category4 = category4Res
     })
 
     afterAll(async () => {
         await app.close()
     })
-
-    const category1 = {
-        name: 'Categoria 1'
-    }
-    const category2 = {
-        name: 'Categoria 2'
-    }
-    const category3 = {
-        name: 'Categoria 3'
-    }
-    const category4 = {
-        name: 'Categoria 4'
-    }
 
     const validateError = (value: unknown, code: number) => {
         expect(value).toEqual(
@@ -70,38 +99,20 @@ describe('Category (e2e)', () => {
         )
     }
 
-    const userRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${userToken}`)
-    const adminRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${adminToken}`)
-
 
     describe('(POST) /category', () => {
-        it('Deve registrar duas categorias distintas', async() => {
-            const categ1_res = await adminRequest(request(app.getHttpServer()).post('/category'))
-                .send(category1)
+        it('Deve registrar uma categoria', async() => {
+            const categRes = await adminRequest(request(app.getHttpServer()).post('/category'))
+                .send(category1Body)
                 .expect(201)
             
-            expect(categ1_res.body).toEqual(
+            expect(categRes.body).toEqual(
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 201,
                     category: {
                         id: expect.any(Number),
-                        name: category1.name
-                    }
-                })
-            )
-
-            const categ2_res = await adminRequest(request(app.getHttpServer()).post('/category'))
-                .send(category2)
-                .expect(201)
-            
-            expect(categ2_res.body).toEqual(
-                expect.objectContaining({
-                    message: expect.any(String),
-                    statusCode: 201,
-                    category: {
-                        id: expect.any(Number),
-                        name: category2.name
+                        name: category1Body.name
                     }
                 })
             )
@@ -133,16 +144,9 @@ describe('Category (e2e)', () => {
 
     describe('(GET) /category/:id', () => {
         it('Pegar uma categoria específica', async () => {
-            const res = await userRequest(request(app.getHttpServer()).post('/category'))
-                .send(category3)
-                .expect(201)
-            
-            const get_res = await userRequest(request(app.getHttpServer()).get(`/category/${res.body.id}`))
+            const getRes = await userRequest(request(app.getHttpServer()).get(`/category/${category1.id}`))
                 .expect(200)
-            expect(get_res.body).toStrictEqual({
-                id: res.body.id,
-                name: category3.name
-            })
+            expect(getRes.body).toStrictEqual(category1)
         })
 
         it('Tenta requisição sem token', async () => {
@@ -164,14 +168,6 @@ describe('Category (e2e)', () => {
             const paginationInfo = {
                 page: 1,
                 limit: 2
-            }
-            
-            // Registrando todas as categorias
-            let categories = [category1, category2, category3, category4]
-            for (let category of categories) {
-                await adminRequest(request(app.getHttpServer()).post('/category'))
-                    .send(category)
-                    .expect(201)
             }
             
             // Checando a resposta do GET
@@ -223,11 +219,7 @@ describe('Category (e2e)', () => {
 
     describe('(PATCH) /category/:id', () => {
         it('Atualiza uma categoria', async () => {
-            
-            const { body: category } = await adminRequest(request(app.getHttpServer()).post('/category'))
-                .send(category1)
-            
-            const res = await adminRequest(request(app.getHttpServer()).patch(`/category/${category.id}`))
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/category/${category1.id}`))
                 .send({
                     name: 'New Category Name'
                 })
@@ -239,18 +231,18 @@ describe('Category (e2e)', () => {
                     message: expect.any(String),
                     statusCode: 200,
                     category: {
-                        id: category.id,
+                        id: category1.id,
                         name: 'New Category Name'
                     }
                 })
             )
 
             // Validando se foi atualizado
-            const get_res = await userRequest(request(app.getHttpServer()).get(`/category/${category.id}`))
+            const getRes = await userRequest(request(app.getHttpServer()).get(`/category/${category1.id}`))
                 .expect(200)
             
-            expect(get_res.body).toStrictEqual({
-                id: category.id,
+            expect(getRes.body).toStrictEqual({
+                id: category1.id,
                 name: 'New Category Name'
             })
         })
@@ -278,10 +270,7 @@ describe('Category (e2e)', () => {
         })
 
         it('Passa informações que não existem', async() => {
-            const { body: category } = await adminRequest(request(app.getHttpServer()).post('/category'))
-                .send(category1)
-            
-            const res = await adminRequest(request(app.getHttpServer()).patch(`/category/${category.id}`))
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/category/${category1.id}`))
                 .send({
                     not_exists_prop: 'Foo Value'
                 })
@@ -293,25 +282,19 @@ describe('Category (e2e)', () => {
 
     describe('(DELETE) /category/:id', () => {
         it('Deleta uma categoria', async () => {
-            const { body: category } = await adminRequest(request(app.getHttpServer()).post('/category'))
-                .send(category1)
-            
-            const res = await adminRequest(request(app.getHttpServer()).delete(`/category/${category.id}`))
+            const res = await adminRequest(request(app.getHttpServer()).delete(`/category/${category1.id}`))
                 .expect(200)
             
             expect(res.body).toEqual(
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 200,
-                    category: {
-                        id: category.id,
-                        name: category.name
-                    }
+                    category: category1
                 })
             )
 
             // Validando se deletou
-            const getRes = await adminRequest(request(app.getHttpServer()).get(`/category/${category.id}`))
+            const getRes = await adminRequest(request(app.getHttpServer()).get(`/category/${category1.id}`))
                 .expect(404)
             validateError(getRes.body, 404)
         })
