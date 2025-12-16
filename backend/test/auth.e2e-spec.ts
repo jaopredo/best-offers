@@ -1,9 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
+import { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 import { App } from 'supertest/types'
-import { AppModule } from '../src/app.module'
+import e2eSetup from './e2e.setup'
 
 /* REPOSITÓRIOS */
 import { DataSource } from 'typeorm'
@@ -13,39 +11,23 @@ describe('Authentication (e2e)', () => {
     let dataSource: DataSource
 
     beforeAll(async () => {
-        const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [
-            ConfigModule.forRoot({
-            envFilePath: ['.env.test.local'],
-            }),
-            AppModule
-        ],
-        }).compile()
+        const setup = await e2eSetup()
+        app = setup.app
+        dataSource = setup.dataSource
+    })
 
-        app = moduleFixture.createNestApplication()
-
-        app.useGlobalPipes(
-            new ValidationPipe({
-                whitelist: true,
-                forbidNonWhitelisted: true,
-                transform: true,
-                transformOptions: {
-                    enableImplicitConversion: true,
-                },
-            })
-        )
-
-        await app.init()
-
+    beforeEach(async () => {
         // Resetando todas as informações no banco de teste para realizar os testes
         // seguidamente quantas vezes eu quiser
-        dataSource = app.get<DataSource>(DataSource)
-        const entities = dataSource.entityMetadatas
-        for (const entity of entities) {
-        const repository = dataSource.getRepository(entity.name)
-        await repository.query(`TRUNCATE TABLE "${entity.tableName}" RESTART IDENTITY CASCADE`)
-        }
+        const tableNames = dataSource.entityMetadatas
+            .map(entity => `"${entity.tableName}"`)
+            .join(', ')
+
+        await dataSource.query(
+            `TRUNCATE ${tableNames} RESTART IDENTITY CASCADE`
+        )
     })
+    
 
     afterAll(async () => {
         await app.close()
