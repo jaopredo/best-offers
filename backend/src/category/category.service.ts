@@ -8,6 +8,9 @@ import { CategoryPostDto } from "types/category/category.dto"
 /* REPOSITÓRIOS */
 import { Category } from "database/models/category"
 
+/* TIPOS */
+import { Pagination } from "types/pagination/pagination.dto"
+
 
 @Injectable()
 export class CategoryService {
@@ -21,15 +24,22 @@ export class CategoryService {
     }
 
     // Fazendo overloads para a tipagem
-    async get(category: { id: number }): Promise<Category | null>
-    async get(category: Partial<Omit<Category, "id">>): Promise<Category[]>
-    async get(category: Partial<Category>) {
-        if (category.id) {
-            return await this.categoryRepository.findOneBy({
-                id: category.id
-            })
-        } else {
-            return await this.categoryRepository.findBy(category)
+    async get(id: number): Promise<Category | null> {
+        return await this.categoryRepository.findOneBy({
+            id: id
+        })
+    }
+
+    async getAll(limit: number, page: number, category?: Partial<Category>) {
+        const [ categories, count ] = await this.categoryRepository.findAndCount({
+            take: limit,
+            skip: page,
+            where: category
+        })
+
+        return {
+            categories,
+            count
         }
     }
 
@@ -47,5 +57,6 @@ export class CategoryService {
     }
 
     async pop(id: number) {
+        await this.categoryRepository.delete({ id: id })
     }
 }

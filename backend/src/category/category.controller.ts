@@ -9,8 +9,12 @@ import {
     Param,
     Patch,
     Post,
+    Query,
     UseGuards
 } from "@nestjs/common"
+
+/* TIPOS */
+import { Pagination } from "types/pagination/pagination.dto"
 
 /* GUARDS */
 import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
@@ -19,7 +23,7 @@ import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
 import { Roles } from "src/decorators/roles.decorator"
 
 /* DTO */
-import { CategoryPostDto } from "types/category/category.dto"
+import { CategoryPaginationQueryDto, CategoryPostDto } from "types/category/category.dto"
 
 /* SERVIÇOS */
 import { CategoryService } from "./category.service"
@@ -46,9 +50,7 @@ export class CategoryController {
 
     @Get('/:id')
     async get(@Param('id') id: string) {
-        const foundCategory = await this.categoryService.get({
-            id: Number(id)
-        })
+        const foundCategory = await this.categoryService.get(Number(id))
 
         if (!foundCategory) throw new NotFoundException('Categoria solicitada não encontrada')
 
@@ -56,8 +58,23 @@ export class CategoryController {
     }
 
     @Get()
-    async getAll() {
-        throw new NotImplementedException()
+    async getAll(@Query() query: CategoryPaginationQueryDto) {
+        const {
+            categories,
+            count
+        } = await this.categoryService.getAll(query.limit, query.page, {
+            name: query.name
+        })
+
+        return {
+            data: categories,
+            meta: {
+                page: query.page,
+                limit: query.limit,
+                total: count,
+                totalPages: Math.floor(count / query.limit)
+            }
+        }
     }
 
     @Patch('/:id')
@@ -77,6 +94,14 @@ export class CategoryController {
     @Delete('/:id')
     @Roles(['admin'])
     async remove(@Param('id') id: string) {
-        throw new NotImplementedException()
+        const category = await this.categoryService.get(Number(id))
+        if (!category) throw new NotFoundException('A categoria especificada não foi encontrada')
+        await this.categoryService.pop(category.id)
+        
+        return {
+            message: 'Categoria deletada com sucesso',
+            statusCode: 200,
+            category
+        }
     }
 }
