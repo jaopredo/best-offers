@@ -63,7 +63,15 @@ export class CategoryController {
     @Patch('/:id')
     @Roles(['admin'])
     async patch(@Param('id') id: string, @Body() category: CategoryPostDto) {
-        throw new NotImplementedException()
+        const updatedCategory = await this.categoryService.update(Number(id), category)
+
+        if (!updatedCategory) throw new NotFoundException('A categoria passada não foi encontrada')
+
+        return {
+            message: 'Categoria atualizada com sucesso',
+            statusCode: 200,
+            category: updatedCategory
+        }
     }
 
     @Delete('/:id')

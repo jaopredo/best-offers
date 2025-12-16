@@ -268,6 +268,9 @@ describe('Category (e2e)', () => {
 
         it('Tenta atualizar categoria que não existe', async() => {
             const res = await adminRequest(request(app.getHttpServer()).patch('/category/200'))
+                .send({
+                    name: 'New Test LoL'
+                })
                 .expect(404)
             
             validateError(res.body, 404)

@@ -34,6 +34,16 @@ export class CategoryService {
     }
 
     async update(id: number, category: CategoryPostDto) {
+        const updatedCategory = await this.categoryRepository.preload({
+            id: id,
+            ...category
+        })
+
+        if (!updatedCategory) return undefined
+
+        await this.categoryRepository.save(updatedCategory)
+        
+        return updatedCategory
     }
 
     async pop(id: number) {
