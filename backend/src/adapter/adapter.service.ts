@@ -16,6 +16,7 @@ export class AdapterService {
     ) {}
 
     async create(adapter: AdapterDto) {
+        return await this.adapterRepository.save(adapter)
     }
 
     async get(id: number) {

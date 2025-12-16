@@ -125,13 +125,14 @@ describe('Adapter (e2e)', () => {
                 .send(secondTypeAdapter)
                 .expect(201)
             
-            expect(resSecondAdapter).toEqual(
+            expect(resSecondAdapter.body).toEqual(
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 201,
                     adapter: {
                         id: expect.any(Number),
-                        ...secondTypeAdapter
+                        ...secondTypeAdapter,
+                        searchParameter: null
                     }
                 })
             )

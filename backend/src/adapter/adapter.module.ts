@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { AuthModule } from 'src/auth/auth.module'
 
 /* CONTROLLERS */
 import { AdapterController } from './adapter.controller'
@@ -9,15 +10,14 @@ import { AdapterService } from './adapter.service'
 
 /* REPOSITÓRIOS */
 import { Adapter } from 'database/models/adapter'
-import { JwtModule } from '@nestjs/jwt'
 
 @Module({
     imports: [
-        JwtModule,
+        AuthModule,
         TypeOrmModule.forFeature([Adapter]),
     ],
     controllers: [AdapterController],
     providers: [AdapterService],
-    exports: [JwtModule]
+    exports: [AuthModule]
 })
 export class AdapterModule {}

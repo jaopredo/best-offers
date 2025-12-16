@@ -35,7 +35,13 @@ export class AdapterController {
     @Post()
     @Roles(['admin'])
     async create(@Body() adapter: AdapterDto) {
-        throw new NotImplementedException()
+        const registeredAdapter = await this.adapterService.create(adapter)
+
+        return {
+            message: 'Adaptador criado com sucesso',
+            statusCode: 201,
+            adapter: registeredAdapter
+        }
     }
 
     @Get('/:id')
