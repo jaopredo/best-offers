@@ -178,7 +178,7 @@ describe('Category (e2e)', () => {
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
-            expect(res.body.data).toHaveLength(2)
+            expect(res.body.data).toHaveLength(paginationInfo.limit)
 
             expect(res.body.meta).toEqual(
                 expect.objectContaining({
