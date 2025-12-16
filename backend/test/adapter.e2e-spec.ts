@@ -197,14 +197,6 @@ describe('Adapter (e2e)', () => {
                 limit: 1
             }
             
-            // Registrando todos os adapters
-            let adapters = [firstTypeAdapter, secondTypeAdapter]
-            for (let adapter of adapters) {
-                await adminRequest(request(app.getHttpServer()).post('/adapter'))
-                    .send(adapter)
-                    .expect(201)
-            }
-            
             // Checando a resposta do GET
             const res = await userRequest(
                 request(app.getHttpServer())

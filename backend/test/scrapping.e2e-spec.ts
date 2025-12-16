@@ -18,6 +18,8 @@ describe('Authentication (e2e)', () => {
 
     let font: Record<string, unknown>
     let adapter: Record<string, unknown>
+    let job1: Record<string, unknown>
+    let job2: Record<string, unknown>
 
     const fontBody = {
         url: 'http://mock-test.foo.com',
@@ -97,6 +99,22 @@ describe('Authentication (e2e)', () => {
         const resFontAdapterRegister = await registerFontAdapter(fontBody, adapterBody)
         font = resFontAdapterRegister.font
         adapter = resFontAdapterRegister.adapter
+        
+        // Registrando também dois jobs que serão utilizados para os testes
+        // de GET, PATCH e DELETE
+        const { body: { job: job1Res } } = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
+            .send({
+                fontId: font.id
+            })
+
+        const { body: { job: job2Res } } = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
+            .send({
+                font: font2Body,
+                adapter: adapter2Body
+            })
+        
+        job1 = job1Res
+        job2 = job2Res
     })
 
 
@@ -143,6 +161,7 @@ describe('Authentication (e2e)', () => {
                     font: font2Body,
                     adapter: adapter2Body
                 })
+                .expect(201)
             
             expect(secondTypeRes.body).toEqual(
                 expect.objectContaining({
@@ -212,6 +231,79 @@ describe('Authentication (e2e)', () => {
                 .expect(400)
             
             validateError(resMissingFields.body, 400)
+        })
+    })
+
+    describe('(GET) /job/:id', () => {
+        it('Deve pegar as informações de um job', async () => {
+            const res = await userRequest(request(app.getHttpServer()).get(`/job/${job1.id}`))
+            expect(res.body).toStrictEqual(job1)
+        })
+
+        it('Tenta acessar sem nenhum token', async () => {
+            const res = await request(app.getHttpServer())
+                .get('/job/1')
+                .expect(401)
+            validateError(res.body, 401)
+        })
+
+        it('Tenta pegar um job que não existe', async () => {
+            const res = await userRequest(request(app.getHttpServer()).get('/job/200'))
+                .expect(404)
+            validateError(res.body, 404)
+        })
+    })
+
+    describe('(GET) /job', () => {
+        it('Pegar vários adapters (Com paginação)', async () => {
+            const paginationInfo = {
+                page: 1,
+                limit: 1
+            }
+            
+            // Checando a resposta do GET
+            const res = await userRequest(
+                request(app.getHttpServer())
+                .get(`/adapter?page=${paginationInfo.page}&limit=${paginationInfo.limit}`)
+            )
+                .expect(200)
+            
+            expect(Array.isArray(res.body.data)).toBe(true)
+            expect(res.body.data).toHaveLength(paginationInfo.limit)
+
+            expect(res.body.meta).toEqual(
+                expect.objectContaining({
+                    page: paginationInfo.page,
+                    limit: paginationInfo.limit,
+                    total: 2,
+                    totalPages: 2
+                })
+            )
+        })
+
+        it('Pegar vários adapters (Com banco vazio)', async () => {
+            const res = await userRequest(request(app.getHttpServer()).get(`/adapter`))
+                .expect(200)
+            
+            expect(Array.isArray(res.body.data)).toBe(true)
+            expect(res.body.data).toEqual([])
+
+            expect(res.body.meta).toEqual(
+                expect.objectContaining({
+                    page: 1,
+                    limit: 10,
+                    total: 0,
+                    totalPages: 1
+                })
+            )
+        })
+
+        it('Tenta pegar sem passar um token', async () => {
+            const res = await request(app.getHttpServer())
+                .get('/adapter')
+                .expect(401)
+            
+            validateError(res.body, 401)
         })
     })
 })
