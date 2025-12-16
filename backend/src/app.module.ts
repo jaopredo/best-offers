@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 
 /* MÓDULOS */
 import { AuthModule } from './auth/auth.module'
+import { CategoryModule } from './category/category.module'
 
 /* MODELS */
 import { User } from 'database/models/user'
@@ -15,6 +16,7 @@ import { Item } from 'database/models/item'
 @Module({
     imports: [
         AuthModule,
+        CategoryModule,
         ConfigModule.forRoot({
             isGlobal: true
         }),

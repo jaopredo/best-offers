@@ -89,14 +89,18 @@ describe('Category (e2e)', () => {
         await app.close()
     })
 
-    const validateError = (value: unknown, code: number) => {
+    const validateError = (value: Record<string,unknown>, code: number) => {
         expect(value).toEqual(
             expect.objectContaining({
-                message: expect.any(String),
+                message: expect.anything(),
                 error: expect.any(String),
                 statusCode: code
             })
         )
+
+        expect(
+            typeof value.message === 'string' || Array.isArray(value.message)
+        ).toBe(true)
     }
 
 
@@ -190,19 +194,22 @@ describe('Category (e2e)', () => {
             )
         })
 
-        it('Pegar várias categorias (Com banco vazio)', async () => {
+        it('Pegar várias categorias (Com informações de pesquisa)', async () => {
             // Checando a resposta do GET
             const res = await userRequest(request(app.getHttpServer()).get(`/category`))
+                .query({
+                    name: '1'
+                })
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
-            expect(res.body.data).toEqual([])
+            expect(res.body.data).toHaveLength(1)
 
             expect(res.body.meta).toEqual(
                 expect.objectContaining({
                     page: 1,
                     limit: 10,
-                    total: 0,
+                    total: 1,
                     totalPages: 1
                 })
             )
@@ -264,6 +271,9 @@ describe('Category (e2e)', () => {
 
         it('Tenta atualizar categoria que não existe', async() => {
             const res = await adminRequest(request(app.getHttpServer()).patch('/category/200'))
+                .send({
+                    name: 'New Test LoL'
+                })
                 .expect(404)
             
             validateError(res.body, 404)
