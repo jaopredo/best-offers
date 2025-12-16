@@ -404,7 +404,7 @@ describe('Font (e2e)', () => {
         it('Deleta uma fonte', async () => {
             const regisRes = await registerFontAdapter(font, helperAdapter)
             
-            const res = await adminRequest(request(app.getHttpServer()).delete(`/adapter/${regisRes.font.id}`))
+            const res = await adminRequest(request(app.getHttpServer()).delete(`/font/${regisRes.font.id}`))
                 .expect(200)
             
             expect(res.body).toEqual(

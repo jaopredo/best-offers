@@ -511,4 +511,46 @@ describe('Item (e2e)', () => {
             validateError(notExistingFontRes.body, 404)
         })
     })
+
+    describe('(DELETE) /item/:id', () => {
+        it('Deleta um item', async () => {
+            const res = await adminRequest(request(app.getHttpServer()).delete(`/item/${item.id}`))
+                .expect(200)
+            
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    item
+                })
+            )
+
+            // Validando se deletou a fonte e o adapter
+            const getItemRes = await adminRequest(request(app.getHttpServer()).get(`/item/${item.id}`))
+                .expect(404)
+            validateError(getItemRes.body, 404)
+        })
+
+        it('Tenta acessar com token de usuário', async() => {
+            const res = await userRequest(request(app.getHttpServer()).delete(`/item/1`))
+                .expect(401)
+            
+            validateError(res.body, 401)
+        })
+
+        it('Tenta acessar sem token', async () => {
+            const res = await request(app.getHttpServer())
+                .delete(`/item/1`)
+                .expect(401)
+            
+            validateError(res.body, 401)
+        })
+
+        it('Tenta deletar item que não existe', async () => {
+            const res = await adminRequest(request(app.getHttpServer()).delete('/item/200'))
+                .expect(404)
+            
+            validateError(res.body, 404)
+        })
+    })
 })
