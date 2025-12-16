@@ -19,47 +19,8 @@ describe('Adapter (e2e)', () => {
     let userToken: string
     let adminToken: string
 
-    beforeAll(async () => {
-        const setup = await e2eSetup()
-        app = setup.app
-        dataSource = setup.dataSource
-        configService = app.get(ConfigService)
-    })
-
-    beforeEach(async () => {
-        // Resetando todas as informações no banco de teste para realizar os testes
-        // seguidamente quantas vezes eu quiser
-        dataSource = app.get<DataSource>(DataSource)
-        const tableNames = dataSource.entityMetadatas
-            .map(entity => `"${entity.tableName}"`)
-            .join(', ')
-
-        await dataSource.query(
-            `TRUNCATE ${tableNames} RESTART IDENTITY CASCADE`
-        )
-
-        // Pegando um token para usuário e para administrador
-        userToken = await getUserAuthToken(app.getHttpServer())
-        await seedAdmin(dataSource, configService)
-        adminToken = await getAdminAuthToken(app.getHttpServer())
-    })
-
-    afterAll(async () => {
-        await app.close()
-    })
-
-    const validateError = (value: unknown, code: number) => {
-        expect(value).toEqual(
-            expect.objectContaining({
-                message: expect.any(String),
-                error: expect.any(String),
-                statusCode: code
-            })
-        )
-    }
-
-    const userRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${userToken}`)
-    const adminRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${adminToken}`)
+    let adapter1: Record<string, unknown>
+    let adapter2: Record<string, unknown>
 
     // O primeiro passa o `searchParameter` como parâmetro da Query
     const firstTypeAdapter = {
@@ -86,6 +47,58 @@ describe('Adapter (e2e)', () => {
         itemSellerClassName: 'item-seller'
     }
 
+    const userRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${userToken}`)
+    const adminRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${adminToken}`)
+
+    beforeAll(async () => {
+        const setup = await e2eSetup()
+        app = setup.app
+        dataSource = setup.dataSource
+        configService = app.get(ConfigService)
+    })
+
+    beforeEach(async () => {
+        // Resetando todas as informações no banco de teste para realizar os testes
+        // seguidamente quantas vezes eu quiser
+        dataSource = app.get<DataSource>(DataSource)
+        const tableNames = dataSource.entityMetadatas
+            .map(entity => `"${entity.tableName}"`)
+            .join(', ')
+
+        await dataSource.query(
+            `TRUNCATE ${tableNames} RESTART IDENTITY CASCADE`
+        )
+
+        // Pegando um token para usuário e para administrador
+        userToken = await getUserAuthToken(app.getHttpServer())
+        await seedAdmin(dataSource, configService)
+        adminToken = await getAdminAuthToken(app.getHttpServer())
+
+        const { body: { adapter: adapter1Res } } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
+            .send(firstTypeAdapter)
+            .expect(201)
+        adapter1 = adapter1Res
+
+        const { body: { adapter: adapter2Res } } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
+            .send(secondTypeAdapter)
+            .expect(201)
+        adapter2 = adapter2Res
+    })
+
+    afterAll(async () => {
+        await app.close()
+    })
+
+    const validateError = (value: unknown, code: number) => {
+        expect(value).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                error: expect.any(String),
+                statusCode: code
+            })
+        )
+    }
+
     
     describe('(POST) /adapter', () => {
         it('Registra vários tipos de adapter', async () => {
@@ -103,7 +116,6 @@ describe('Adapter (e2e)', () => {
                     }
                 })
             )
-
 
             const resSecondAdapter = await adminRequest(request(app.getHttpServer()).post('/adapter'))
                 .send(secondTypeAdapter)
@@ -159,16 +171,9 @@ describe('Adapter (e2e)', () => {
 
     describe('(GET) /adapter/:id', () => {
         it('Pegar um adapter específica', async () => {
-            const { body: { adapter } } = await userRequest(request(app.getHttpServer()).post('/adapter'))
-                .send(firstTypeAdapter)
-                .expect(201)
-            
-            const get_res = await userRequest(request(app.getHttpServer()).get(`/adapter/${adapter.id}`))
+            const res = await userRequest(request(app.getHttpServer()).get(`/adapter/${adapter1.id}`))
                 .expect(200)
-            expect(get_res.body).toStrictEqual({
-                id: adapter.body.id,
-                ...firstTypeAdapter
-            })
+            expect(res.body).toStrictEqual(adapter1)
         })
 
         it('Tenta requisição sem token', async () => {
@@ -248,10 +253,7 @@ describe('Adapter (e2e)', () => {
 
     describe('(PATCH) /adapter/:id', () => {
         it('Atualiza um adapter', async () => {
-            const { body: { adapter } } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
-                .send(firstTypeAdapter)
-            
-            const res = await adminRequest(request(app.getHttpServer()).patch(`/adapter/${adapter.id}`))
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/adapter/${adapter1.id}`))
                 .send({
                     sep: 'test-sep'
                 })
@@ -263,18 +265,18 @@ describe('Adapter (e2e)', () => {
                     message: expect.any(String),
                     statusCode: 200,
                     adapter: {
-                        ...adapter,
+                        ...adapter1,
                         sep: 'test-sep'
                     }
                 })
             )
 
             // Validando se foi atualizado
-            const get_res = await userRequest(request(app.getHttpServer()).get(`/adapter/${adapter.id}`))
+            const getRes = await userRequest(request(app.getHttpServer()).get(`/adapter/${adapter1.id}`))
                 .expect(200)
             
-            expect(get_res.body).toStrictEqual({
-                ...adapter,
+            expect(getRes.body).toStrictEqual({
+                ...adapter1,
                 name: 'test-sep'
             })
         })
@@ -302,10 +304,7 @@ describe('Adapter (e2e)', () => {
         })
 
         it('Passa informações que não existem', async() => {
-            const { body: { adapter } } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
-                .send(firstTypeAdapter)
-            
-            const res = await adminRequest(request(app.getHttpServer()).patch(`/adapter/${adapter.id}`))
+            const res = await adminRequest(request(app.getHttpServer()).patch(`/adapter/${adapter1.id}`))
                 .send({
                     not_exists_prop: 'Foo Value'
                 })
@@ -317,22 +316,19 @@ describe('Adapter (e2e)', () => {
 
     describe('(DELETE) /adapter/:id', () => {
         it('Deleta um adapter', async () => {
-            const { body: { adapter } } = await adminRequest(request(app.getHttpServer()).post('/adapter'))
-                .send(firstTypeAdapter)
-            
-            const res = await adminRequest(request(app.getHttpServer()).delete(`/adapter/${adapter.id}`))
+            const res = await adminRequest(request(app.getHttpServer()).delete(`/adapter/${adapter1.id}`))
                 .expect(200)
             
             expect(res.body).toEqual(
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 200,
-                    adapter
+                    adapter: adapter1
                 })
             )
 
             // Validando se deletou o personagem
-            const getRes = await adminRequest(request(app.getHttpServer()).get(`/adapter/${adapter.id}`))
+            const getRes = await adminRequest(request(app.getHttpServer()).get(`/adapter/${adapter1.id}`))
                 .expect(404)
             validateError(getRes.body, 404)
         })
