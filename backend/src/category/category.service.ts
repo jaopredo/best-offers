@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotImplementedException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { Repository, ILike, FindOptionsWhere } from "typeorm"
 
 /* DTO */
 import { CategoryPostDto } from "types/category/category.dto"
@@ -10,6 +10,7 @@ import { Category } from "database/models/category"
 
 /* TIPOS */
 import { Pagination } from "types/pagination/pagination.dto"
+import { whereFormater } from "utils/whereFormater"
 
 
 @Injectable()
@@ -31,10 +32,13 @@ export class CategoryService {
     }
 
     async getAll(limit: number, page: number, category?: Partial<Category>) {
+        let payload: FindOptionsWhere<Category> = {}
+        if (category) payload = whereFormater<Category>(category)
+
         const [ categories, count ] = await this.categoryRepository.findAndCount({
             take: limit,
-            skip: page,
-            where: category
+            skip: (page-1)*limit,
+            where: payload
         })
 
         return {

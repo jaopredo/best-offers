@@ -72,7 +72,7 @@ export class CategoryController {
                 page: query.page,
                 limit: query.limit,
                 total: count,
-                totalPages: Math.floor(count / query.limit)
+                totalPages: Math.ceil(count / query.limit)
             }
         }
     }

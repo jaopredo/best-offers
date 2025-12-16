@@ -18,5 +18,5 @@ export class CategoryPaginationQueryDto {
     page: number = 1
 
     @IsOptional()
-    name: string
+    name: string = ''
 }

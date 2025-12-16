@@ -194,19 +194,22 @@ describe('Category (e2e)', () => {
             )
         })
 
-        it('Pegar várias categorias (Com banco vazio)', async () => {
+        it('Pegar várias categorias (Com informações de pesquisa)', async () => {
             // Checando a resposta do GET
             const res = await userRequest(request(app.getHttpServer()).get(`/category`))
+                .query({
+                    name: '1'
+                })
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
-            expect(res.body.data).toEqual([])
+            expect(res.body.data).toHaveLength(1)
 
             expect(res.body.meta).toEqual(
                 expect.objectContaining({
                     page: 1,
                     limit: 10,
-                    total: 0,
+                    total: 1,
                     totalPages: 1
                 })
             )
