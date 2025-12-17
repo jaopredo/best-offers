@@ -7,6 +7,7 @@ import {
     NotFoundException,
     NotImplementedException,
     Param,
+    ParseIntPipe,
     Patch,
     Post,
     Query,
@@ -49,8 +50,8 @@ export class CategoryController {
     }
 
     @Get('/:id')
-    async get(@Param('id') id: string) {
-        const foundCategory = await this.categoryService.get(Number(id))
+    async get(@Param('id', ParseIntPipe) id: number) {
+        const foundCategory = await this.categoryService.get(id)
 
         if (!foundCategory) throw new NotFoundException('Categoria solicitada não encontrada')
 
@@ -79,8 +80,8 @@ export class CategoryController {
 
     @Patch('/:id')
     @Roles(['admin'])
-    async patch(@Param('id') id: string, @Body() category: CategoryUpdateDto) {
-        const updatedCategory = await this.categoryService.update(Number(id), category)
+    async patch(@Param('id', ParseIntPipe) id: number, @Body() category: CategoryUpdateDto) {
+        const updatedCategory = await this.categoryService.update(id, category)
 
         if (!updatedCategory) throw new NotFoundException('A categoria passada não foi encontrada')
 
@@ -93,8 +94,8 @@ export class CategoryController {
 
     @Delete('/:id')
     @Roles(['admin'])
-    async remove(@Param('id') id: string) {
-        const category = await this.categoryService.get(Number(id))
+    async remove(@Param('id', ParseIntPipe) id: number) {
+        const category = await this.categoryService.get(id)
         if (!category) throw new NotFoundException('A categoria especificada não foi encontrada')
         await this.categoryService.pop(category.id)
         
