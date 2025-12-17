@@ -10,6 +10,7 @@ import {
     ParseIntPipe,
     Patch,
     Post,
+    Query,
     UseGuards
 } from "@nestjs/common"
 
@@ -20,10 +21,11 @@ import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
 import { Roles } from "src/decorators/roles.decorator"
 
 /* DTO */
-import { FontPostDto, FontUpdateDto } from "types/font/font.dto"
+import { FontPaginationQueryDto, FontPostDto, FontUpdateDto } from "types/font/font.dto"
 
 /* SERVIÇOS */
 import { FontService } from "./fonts.service"
+import { cleanPagination } from "utils/paginationCleaner"
 
 
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -49,12 +51,31 @@ export class FontController {
 
     @Get('/:id')
     async get(@Param('id', ParseIntPipe) id: number) {
-        throw new NotImplementedException()
+        const foundFont = await this.fontService.get(id)
+
+        if (!foundFont) throw new NotFoundException('Fonte especificada não encontrada')
+        
+        return foundFont
     }
 
     @Get()
-    async getAll() {
-        throw new NotImplementedException()
+    async getAll(@Query() query: FontPaginationQueryDto) {
+        const where = cleanPagination<FontPaginationQueryDto>(query)
+        delete where.adapterId
+        const {
+            fonts,
+            count
+        } = await this.fontService.getAll(query.limit, query.page, where)
+
+        return {
+            data: fonts,
+            meta: {
+                page: query.page,
+                limit: query.limit,
+                total: count,
+                totalPages: Math.ceil(count / query.limit)
+            }
+        }
     }
 
     @Patch('/:id')

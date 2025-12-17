@@ -267,16 +267,19 @@ describe('Font (e2e)', () => {
 
         it('Pegar várias fontes (Com banco vazio)', async () => {
             const res = await userRequest(request(app.getHttpServer()).get(`/font`))
+                .query({
+                    name: 'Foo'
+                })
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
-            expect(res.body.data).toEqual([])
+            expect(res.body.data).toHaveLength(1)
 
             expect(res.body.meta).toEqual(
                 expect.objectContaining({
                     page: 1,
                     limit: 10,
-                    total: 0,
+                    total: 1,
                     totalPages: 1
                 })
             )
