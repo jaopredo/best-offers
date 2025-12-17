@@ -21,7 +21,7 @@ import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
 import { Roles } from "src/decorators/roles.decorator"
 
 /* DTO */
-import { AdapterDto, AdapterPaginationQueryDto, AdapterUpdateDto } from "types/adapter/adapter.dto"
+import { AdapterPostDto, AdapterPaginationQueryDto, AdapterUpdateDto } from "types/adapter/adapter.dto"
 
 /* SERVIÇOS */
 import { AdapterService } from "./adapter.service"
@@ -37,7 +37,7 @@ export class AdapterController {
 
     @Post()
     @Roles(['admin'])
-    async create(@Body() adapter: AdapterDto) {
+    async create(@Body() adapter: AdapterPostDto) {
         const registeredAdapter = await this.adapterService.create(adapter)
 
         return {

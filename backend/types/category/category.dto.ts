@@ -7,6 +7,11 @@ export class CategoryPostDto {
     name: string
 }
 
+export class CategoryUpdateDto {
+    @IsNotEmpty()
+    name: string
+}
+
 export class CategoryPaginationQueryDto extends PaginationQueryParams {
     @IsOptional()
     name: string = ''

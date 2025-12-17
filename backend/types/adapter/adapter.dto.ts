@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsOptional } from "class-validator"
 import { PaginationQueryParams } from "types/pagination/pagination.dto"
 
-export class AdapterDto {
+export class AdapterPostDto {
     @IsNotEmpty()
     searchURL: string
     

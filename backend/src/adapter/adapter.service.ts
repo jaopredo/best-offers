@@ -6,7 +6,7 @@ import { FindOptionsWhere, Repository } from "typeorm"
 import { Adapter } from "database/models/adapter"
 
 /* DTO */
-import { AdapterDto } from "types/adapter/adapter.dto"
+import { AdapterPostDto } from "types/adapter/adapter.dto"
 
 /* UTILS */
 import { whereFormater } from "utils/whereFormater"
@@ -18,7 +18,7 @@ export class AdapterService {
         @InjectRepository(Adapter) private adapterRepository: Repository<Adapter>
     ) {}
 
-    async create(adapter: AdapterDto) {
+    async create(adapter: AdapterPostDto) {
         return await this.adapterRepository.save(adapter)
     }
 
@@ -44,7 +44,7 @@ export class AdapterService {
         }
     }
 
-    async update(id: number, adapter: Partial<AdapterDto>) {
+    async update(id: number, adapter: Partial<AdapterPostDto>) {
         const updatedAdapter = await this.adapterRepository.preload({
             id: id,
             ...adapter

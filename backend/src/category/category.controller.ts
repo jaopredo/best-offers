@@ -23,7 +23,7 @@ import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
 import { Roles } from "src/decorators/roles.decorator"
 
 /* DTO */
-import { CategoryPaginationQueryDto, CategoryPostDto } from "types/category/category.dto"
+import { CategoryPaginationQueryDto, CategoryPostDto, CategoryUpdateDto } from "types/category/category.dto"
 
 /* SERVIÇOS */
 import { CategoryService } from "./category.service"
@@ -79,7 +79,7 @@ export class CategoryController {
 
     @Patch('/:id')
     @Roles(['admin'])
-    async patch(@Param('id') id: string, @Body() category: CategoryPostDto) {
+    async patch(@Param('id') id: string, @Body() category: CategoryUpdateDto) {
         const updatedCategory = await this.categoryService.update(Number(id), category)
 
         if (!updatedCategory) throw new NotFoundException('A categoria passada não foi encontrada')
