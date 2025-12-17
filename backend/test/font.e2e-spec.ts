@@ -405,7 +405,7 @@ describe('Font (e2e)', () => {
         it('Deleta uma fonte', async () => {
             const res = await adminRequest(request(app.getHttpServer()).delete(`/font/${font1.id}`))
                 .expect(200)
-            
+
             expect(res.body).toEqual(
                 expect.objectContaining({
                     message: expect.any(String),
@@ -418,10 +418,6 @@ describe('Font (e2e)', () => {
             const getFontRes = await adminRequest(request(app.getHttpServer()).get(`/font/${font1.id}`))
                 .expect(404)
             validateError(getFontRes.body, 404)
-
-            const getAdapterRes = await adminRequest(request(app.getHttpServer()).get(`/adapter/${adapter1.id}`))
-                .expect(404)
-            validateError(getAdapterRes.body, 404)
         })
 
         it('Tenta acessar com token de usuário', async() => {

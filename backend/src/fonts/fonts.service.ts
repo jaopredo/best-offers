@@ -59,6 +59,7 @@ export class FontService {
     async update(id: number, font: Partial<FontPostDto>) {
     }
 
-    async pop(id: number) {
+    async pop(font: Font) {
+        await this.fontRepository.remove({...font})
     }
 }

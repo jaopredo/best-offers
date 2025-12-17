@@ -87,6 +87,14 @@ export class FontController {
     @Delete('/:id')
     @Roles(['admin'])
     async remove(@Param('id', ParseIntPipe) id: number) {
-        throw new NotImplementedException()
+        const font = await this.fontService.get(id)
+        if (!font) throw new NotFoundException('A fonte especificada não foi encontrada')
+        await this.fontService.pop(font)
+        
+        return {
+            message: 'Fonte deletada com sucesso',
+            statusCode: 200,
+            font
+        }
     }
 }
