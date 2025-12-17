@@ -21,12 +21,11 @@ import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
 import { Roles } from "src/decorators/roles.decorator"
 
 /* DTO */
-import { ItemPostDto, ItemUpdateDto } from "types/item/item.dto"
+import { ItemPaginationQueryDto, ItemPostDto, ItemUpdateDto } from "types/item/item.dto"
 
 /* SERVIÇOS */
 import { ItemService } from "./items.service"
-import { FontService } from "src/fonts/fonts.service"
-import { CategoryService } from "src/category/category.service"
+import { cleanPagination } from "utils/paginationCleaner"
 
 
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -34,8 +33,6 @@ import { CategoryService } from "src/category/category.service"
 export class ItemController {
     constructor(
         private itemService: ItemService,
-        private fontService: FontService,
-        private categoryService: CategoryService
     ) {}
 
     @Post()
@@ -54,12 +51,33 @@ export class ItemController {
 
     @Get('/:id')
     async get(@Param('id', ParseIntPipe) id: number) {
-        throw new NotImplementedException()
+        const foundItem = await this.itemService.get(id)
+
+        if (!foundItem) throw new NotFoundException('Item especificado não encontrado')
+        
+        return foundItem
     }
 
     @Get()
-    async getAll(@Query() query: ItemUpdateDto) {
-        throw new NotImplementedException()
+    async getAll(@Query() query: ItemPaginationQueryDto) {
+        const where = cleanPagination<ItemPaginationQueryDto>(query)
+        delete where.fontId
+        delete where.categoryId
+        
+        const {
+            items,
+            count
+        } = await this.itemService.getAll(query.limit, query.page, where)
+
+        return {
+            data: items,
+            meta: {
+                page: query.page,
+                limit: query.limit,
+                total: count,
+                totalPages: Math.ceil(count / query.limit)
+            }
+        }
     }
 
     @Patch('/:id')

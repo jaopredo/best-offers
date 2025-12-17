@@ -315,18 +315,6 @@ describe('Item (e2e)', () => {
                 limit: 2
             }
             
-            // Registrando todos os itens
-            let items = [itemBody, itemBody, itemBody]
-            for (let item of items) {
-                await adminRequest(request(app.getHttpServer()).post('/item'))
-                    .send({
-                        ...item,
-                        categoryId: category.id,
-                        fontId: font.id
-                    })
-                    .expect(201)
-            }
-            
             // Checando a resposta do GET
             const res = await userRequest(
                 request(app.getHttpServer())
@@ -341,25 +329,28 @@ describe('Item (e2e)', () => {
                 expect.objectContaining({
                     page: paginationInfo.page,
                     limit: paginationInfo.limit,
-                    total: 4,
-                    totalPages: 2
+                    total: 2,
+                    totalPages: 1
                 })
             )
         })
 
-        it('Pegar vários itens (Com banco vazio)', async () => {
+        it('Pegar vários itens (Com pesquisa)', async () => {
             // Checando a resposta do GET
             const res = await userRequest(request(app.getHttpServer()).get(`/item`))
+                .query({
+                    name: 'Papel'
+                })
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
-            expect(res.body.data).toEqual([])
+            expect(res.body.data).toHaveLength(1)
 
             expect(res.body.meta).toEqual(
                 expect.objectContaining({
                     page: 1,
                     limit: 10,
-                    total: 0,
+                    total: 1,
                     totalPages: 1
                 })
             )

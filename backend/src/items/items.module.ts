@@ -6,8 +6,6 @@ import { ItemController } from './items.controller'
 
 /* SERVIÇOS */
 import { ItemService } from './items.service'
-import { FontService } from 'src/fonts/fonts.service'
-import { CategoryService } from 'src/category/category.service'
 
 /* REPOSITÓRIOS */
 import { Item } from 'database/models/item'
@@ -22,7 +20,7 @@ import { AuthModule } from 'src/auth/auth.module'
         TypeOrmModule.forFeature([Item, Category, Font, Adapter]),
     ],
     controllers: [ItemController],
-    providers: [ItemService, FontService, CategoryService],
+    providers: [ItemService],
     exports: [AuthModule]
 })
 export class ItemModule {}
