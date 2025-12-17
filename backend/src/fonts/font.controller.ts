@@ -36,7 +36,15 @@ export class FontController {
     @Post()
     @Roles(['admin'])
     async create(@Body() font: FontPostDto) {
-        throw new NotImplementedException()
+        const createdFont = await this.fontService.create(font)
+
+        if (!createdFont) throw new NotFoundException('O adapter informado no corpo da requisição não foi encontrado')
+
+        return {
+            message: 'Categoria criada com sucesso',
+            statusCode: 201,
+            font: createdFont
+        }
     }
 
     @Get('/:id')

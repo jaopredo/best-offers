@@ -17,7 +17,18 @@ export class FontService {
         @InjectRepository(Adapter) private adapterRepository: Repository<Adapter>
     ) {}
 
-    async create(fontData: FontPostDto) {
+    async create(font: FontPostDto) {
+        const adapter = await this.adapterRepository.findOneBy({
+            id: font.adapterId
+        })
+
+        if (!adapter) return undefined
+
+        return await this.fontRepository.save({
+            ...font,
+            adapterId: undefined,
+            adapter
+        })
     }
 
     async get(id: number) {
