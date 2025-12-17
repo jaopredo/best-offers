@@ -81,7 +81,7 @@ export class AdapterController {
     async patch(@Param('id', ParseIntPipe) id: number, @Body() adapter: AdapterUpdateDto) {
         const updatedAdapter = await this.adapterService.update(id, adapter)
 
-        if (!updatedAdapter) throw new NotFoundException('O adapter passado não foi encontrada')
+        if (!updatedAdapter) throw new NotFoundException('O adapter passado não foi encontrado')
 
         return {
             message: 'Adapter atualizado com sucesso',
@@ -92,7 +92,15 @@ export class AdapterController {
 
     @Delete('/:id')
     @Roles(['admin'])
-    async remove(@Param('id') id: string) {
-        throw new NotImplementedException()
+    async remove(@Param('id', ParseIntPipe) id: number) {
+        const adapter = await this.adapterService.get(id)
+        if (!adapter) throw new NotFoundException('O adapter especificado não foi encontrado')
+        await this.adapterService.pop(adapter.id)
+        
+        return {
+            message: 'Adapter deletado com sucesso',
+            statusCode: 200,
+            adapter: adapter
+        }
     }
 }

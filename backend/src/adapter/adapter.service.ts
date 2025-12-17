@@ -58,5 +58,6 @@ export class AdapterService {
     }
 
     async pop(id: number) {
+        await this.adapterRepository.delete({ id: id })
     }
 }
