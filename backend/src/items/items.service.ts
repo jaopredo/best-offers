@@ -64,5 +64,6 @@ export class ItemService {
     }
 
     async pop(id: number) {
+        await this.itemRepository.delete({ id })
     }
 }

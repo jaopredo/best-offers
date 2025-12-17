@@ -63,7 +63,7 @@ export class ItemController {
         const where = cleanPagination<ItemPaginationQueryDto>(query)
         delete where.fontId
         delete where.categoryId
-        
+
         const {
             items,
             count
@@ -89,6 +89,14 @@ export class ItemController {
     @Delete('/:id')
     @Roles(['admin'])
     async remove(@Param('id', ParseIntPipe) id: number) {
-        throw new NotImplementedException()
+        const item = await this.itemService.get(id)
+        if (!item) throw new NotFoundException('O item especificado não foi encontrado')
+        await this.itemService.pop(item.id)
+        
+        return {
+            message: 'Item deletado com sucesso',
+            statusCode: 200,
+            item
+        }
     }
 }
