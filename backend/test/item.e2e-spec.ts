@@ -118,10 +118,9 @@ describe('Item (e2e)', () => {
         const { body: { item: resItem } } = await adminRequest(request(app.getHttpServer()).post('/item'))
             .send({
                 ...item,
-                fontId: font.id,
-                categoryId: category.id
+                fontId: resFont.id,
+                categoryId: resCategory.id
             })
-            .expect(201)
         
         // Retorno um objeto tanto com a fonte quanto com o adapter
         return { font: resFont, category: resCategory, adapter: resAdapter, item: resItem }
@@ -208,15 +207,20 @@ describe('Item (e2e)', () => {
                 })
                 .expect(201)
             
+            let fontResponse = {
+                ...font
+            }
+            delete fontResponse.adapter
+            
             expect(res.body).toEqual(
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 201,
                     item: {
+                        id: expect.any(Number),
                         ...itemBody,
                         font: {
-                            ...font,
-                            adapter: undefined  // Eu não quero retornar o adaptador da fonte dentro da response do item
+                            ...fontResponse,
                         },
                         category: category
                     }

@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsNumber, IsOptional } from "class-validator"
-import { Category } from "database/models/category"
-import { Font } from "database/models/font"
+import { IsNotEmpty, IsNumber, IsOptional, IsUrl } from "class-validator"
+import { PaginationQueryParams } from "types/pagination/pagination.dto"
 
 export class ItemPostDto {
     @IsNotEmpty()
     name: string
 
+    @IsNotEmpty()
     @IsNumber()
     price: number
 
@@ -13,7 +13,7 @@ export class ItemPostDto {
     url: string
 
     @IsOptional()
-    seller?: string
+    seller: string
 
     @IsNotEmpty()
     @IsNumber()
@@ -24,11 +24,48 @@ export class ItemPostDto {
     fontId: number
 }
 
-export class ItemDto {
+export class ItemUpdateDto {
+    @IsOptional()
     name: string
+
+    @IsOptional()
+    @IsNumber()
     price: number
+
+    @IsOptional()
     url: string
+
+    @IsOptional()
     seller?: string
-    category: Category
-    font: Font
+
+    @IsOptional()
+    @IsNumber()
+    categoryId: number
+
+    @IsOptional()
+    @IsNumber()
+    fontId: number
+}
+
+export class ItemPaginationQueryDto extends PaginationQueryParams {
+    @IsOptional()
+    name: string
+
+    @IsOptional()
+    @IsNumber()
+    price: number
+
+    @IsOptional()
+    url: string
+
+    @IsOptional()
+    seller?: string
+
+    @IsOptional()
+    @IsNumber()
+    categoryId: number
+
+    @IsOptional()
+    @IsNumber()
+    fontId: number
 }

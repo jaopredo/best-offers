@@ -21,7 +21,7 @@ import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
 import { Roles } from "src/decorators/roles.decorator"
 
 /* DTO */
-import { ItemDto, ItemPostDto } from "types/item/item.dto"
+import { ItemPostDto, ItemUpdateDto } from "types/item/item.dto"
 
 /* SERVIÇOS */
 import { ItemService } from "./items.service"
@@ -41,7 +41,15 @@ export class ItemController {
     @Post()
     @Roles(['admin'])
     async create(@Body() item: ItemPostDto) {
-        throw new NotImplementedException()
+        const createdItem = await this.itemService.create(item)
+
+        if (!createdItem) throw new NotFoundException('A fonte ou a categoria informados no corpo da requisição não foram encontrados')
+
+        return {
+            message: 'Item criado com sucesso',
+            statusCode: 201,
+            item: createdItem
+        }
     }
 
     @Get('/:id')
@@ -50,13 +58,13 @@ export class ItemController {
     }
 
     @Get()
-    async getAll(@Query() query) {
+    async getAll(@Query() query: ItemUpdateDto) {
         throw new NotImplementedException()
     }
 
     @Patch('/:id')
     @Roles(['admin'])
-    async patch(@Param('id', ParseIntPipe) id: number, @Body() item: Partial<ItemDto>) {
+    async patch(@Param('id', ParseIntPipe) id: number, @Body() item: ItemUpdateDto) {
         throw new NotImplementedException()
     }
 
