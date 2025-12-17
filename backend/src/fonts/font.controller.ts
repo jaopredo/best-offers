@@ -97,7 +97,7 @@ export class FontController {
     async remove(@Param('id', ParseIntPipe) id: number) {
         const font = await this.fontService.get(id)
         if (!font) throw new NotFoundException('A fonte especificada não foi encontrada')
-        await this.fontService.pop(font)
+        await this.fontService.pop(font.id)
         
         return {
             message: 'Fonte deletada com sucesso',

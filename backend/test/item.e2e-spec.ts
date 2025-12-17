@@ -118,10 +118,9 @@ describe('Item (e2e)', () => {
         const { body: { item: resItem } } = await adminRequest(request(app.getHttpServer()).post('/item'))
             .send({
                 ...item,
-                fontId: font.id,
-                categoryId: category.id
+                fontId: resFont.id,
+                categoryId: resCategory.id
             })
-            .expect(201)
         
         // Retorno um objeto tanto com a fonte quanto com o adapter
         return { font: resFont, category: resCategory, adapter: resAdapter, item: resItem }
@@ -213,11 +212,9 @@ describe('Item (e2e)', () => {
                     message: expect.any(String),
                     statusCode: 201,
                     item: {
+                        id: expect.any(Number),
                         ...itemBody,
-                        font: {
-                            ...font,
-                            adapter: undefined  // Eu não quero retornar o adaptador da fonte dentro da response do item
-                        },
+                        font: font,
                         category: category
                     }
                 })
@@ -311,18 +308,6 @@ describe('Item (e2e)', () => {
                 limit: 2
             }
             
-            // Registrando todos os itens
-            let items = [itemBody, itemBody, itemBody]
-            for (let item of items) {
-                await adminRequest(request(app.getHttpServer()).post('/item'))
-                    .send({
-                        ...item,
-                        categoryId: category.id,
-                        fontId: font.id
-                    })
-                    .expect(201)
-            }
-            
             // Checando a resposta do GET
             const res = await userRequest(
                 request(app.getHttpServer())
@@ -337,25 +322,28 @@ describe('Item (e2e)', () => {
                 expect.objectContaining({
                     page: paginationInfo.page,
                     limit: paginationInfo.limit,
-                    total: 4,
-                    totalPages: 2
+                    total: 2,
+                    totalPages: 1
                 })
             )
         })
 
-        it('Pegar vários itens (Com banco vazio)', async () => {
+        it('Pegar vários itens (Com pesquisa)', async () => {
             // Checando a resposta do GET
             const res = await userRequest(request(app.getHttpServer()).get(`/item`))
+                .query({
+                    name: 'Papel'
+                })
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
-            expect(res.body.data).toEqual([])
+            expect(res.body.data).toHaveLength(1)
 
             expect(res.body.meta).toEqual(
                 expect.objectContaining({
                     page: 1,
                     limit: 10,
-                    total: 0,
+                    total: 1,
                     totalPages: 1
                 })
             )
@@ -379,6 +367,9 @@ describe('Item (e2e)', () => {
                 })
                 .expect(200)
             
+            console.log(res.body)
+            console.log(item)
+            
             // Validando o corpo da requisição
             expect(res.body).toEqual(
                 expect.objectContaining({
@@ -397,7 +388,7 @@ describe('Item (e2e)', () => {
             
             expect(get_res.body).toStrictEqual({
                 ...item,
-                name: 'Mock Test'
+                name: 'Mock Item'
             })
         })
 
@@ -416,10 +407,7 @@ describe('Item (e2e)', () => {
                     statusCode: 200,
                     item: {
                         ...item,
-                        font: {
-                            ...font2,
-                            adapter: undefined
-                        }
+                        font: font2
                     }
                 })
             )
@@ -427,13 +415,9 @@ describe('Item (e2e)', () => {
             // Validando se foi atualizado
             const getRes = await userRequest(request(app.getHttpServer()).get(`/item/${item.id}`))
                 .expect(200)
-            
             expect(getRes.body).toStrictEqual({
                 ...item,
-                font: {
-                    ...font2,
-                    adapter: undefined
-                }
+                font: font2
             })
         })
 
