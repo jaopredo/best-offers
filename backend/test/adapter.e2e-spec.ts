@@ -277,7 +277,7 @@ describe('Adapter (e2e)', () => {
             
             expect(getRes.body).toStrictEqual({
                 ...adapter1,
-                name: 'test-sep'
+                sep: 'test-sep'
             })
         })
 

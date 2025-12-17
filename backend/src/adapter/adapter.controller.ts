@@ -21,7 +21,7 @@ import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
 import { Roles } from "src/decorators/roles.decorator"
 
 /* DTO */
-import { AdapterDto, AdapterPaginationQueryDto } from "types/adapter/adapter.dto"
+import { AdapterDto, AdapterPaginationQueryDto, AdapterUpdateDto } from "types/adapter/adapter.dto"
 
 /* SERVIÇOS */
 import { AdapterService } from "./adapter.service"
@@ -78,8 +78,16 @@ export class AdapterController {
 
     @Patch('/:id')
     @Roles(['admin'])
-    async patch(@Param('id') id: string, @Body() adapter: Partial<AdapterDto>) {
-        throw new NotImplementedException()
+    async patch(@Param('id', ParseIntPipe) id: number, @Body() adapter: AdapterUpdateDto) {
+        const updatedAdapter = await this.adapterService.update(id, adapter)
+
+        if (!updatedAdapter) throw new NotFoundException('O adapter passado não foi encontrada')
+
+        return {
+            message: 'Adapter atualizado com sucesso',
+            statusCode: 200,
+            adapter: updatedAdapter
+        }
     }
 
     @Delete('/:id')

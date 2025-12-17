@@ -45,6 +45,16 @@ export class AdapterService {
     }
 
     async update(id: number, adapter: Partial<AdapterDto>) {
+        const updatedAdapter = await this.adapterRepository.preload({
+            id: id,
+            ...adapter
+        })
+
+        if (!updatedAdapter) return undefined
+
+        await this.adapterRepository.save(updatedAdapter)
+        
+        return updatedAdapter
     }
 
     async pop(id: number) {
