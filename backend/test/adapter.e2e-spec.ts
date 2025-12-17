@@ -222,18 +222,21 @@ describe('Adapter (e2e)', () => {
             )
         })
 
-        it('Pegar vários adapters (Com banco vazio)', async () => {
+        it('Pegar vários adapters (Com informações de pesquisa)', async () => {
             const res = await userRequest(request(app.getHttpServer()).get(`/adapter`))
+                .query({
+                    sep: '+'
+                })
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
-            expect(res.body.data).toEqual([])
+            expect(res.body.data).toHaveLength(1)
 
             expect(res.body.meta).toEqual(
                 expect.objectContaining({
                     page: 1,
                     limit: 10,
-                    total: 0,
+                    total: 1,
                     totalPages: 1
                 })
             )

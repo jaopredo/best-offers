@@ -25,6 +25,7 @@ import { AdapterDto, AdapterPaginationQueryDto } from "types/adapter/adapter.dto
 
 /* SERVIÇOS */
 import { AdapterService } from "./adapter.service"
+import { cleanPagination } from "utils/paginationCleaner"
 
 
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -57,12 +58,12 @@ export class AdapterController {
 
     @Get()
     async getAll(@Query() query: AdapterPaginationQueryDto) {
+        const where = cleanPagination<AdapterPaginationQueryDto>(query)
+
         const {
             adapters,
             count
-        } = await this.adapterService.getAll(query.limit, query.page, {
-            
-        })
+        } = await this.adapterService.getAll(query.limit, query.page, where)
 
         return {
             data: adapters,
