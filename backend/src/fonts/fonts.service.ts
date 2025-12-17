@@ -57,6 +57,29 @@ export class FontService {
     }
 
     async update(id: number, font: Partial<FontPostDto>) {
+        // Eu procuro a fonte informada
+        const foundFont = await this.fontRepository.findOne({
+            where: { id: id },
+            relations: ['adapter']
+        })
+
+        if (!foundFont) return undefined
+
+        if (font.adapterId) {
+            const adapter = await this.adapterRepository.findOneBy({
+                id: font.adapterId
+            })
+
+            if (!adapter) return undefined
+
+            foundFont.adapter = adapter
+        }
+
+        for (let [key, value] of Object.entries(font)) {
+            if (value != undefined && key != 'adapterId') foundFont[key] = font[key]
+        }
+
+        return await this.fontRepository.save(foundFont)
     }
 
     async pop(font: Font) {

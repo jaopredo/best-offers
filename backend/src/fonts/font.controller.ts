@@ -81,7 +81,15 @@ export class FontController {
     @Patch('/:id')
     @Roles(['admin'])
     async patch(@Param('id', ParseIntPipe) id: number, @Body() font: FontUpdateDto) {
-        throw new NotImplementedException()
+        const updatedFont = await this.fontService.update(id, font)
+
+        if (!updatedFont) throw new NotFoundException('A fonte passada ou o adapter passado no corpo não foram encontrados')
+
+        return {
+            message: 'Fonte atualizada com sucesso',
+            statusCode: 200,
+            font: updatedFont
+        }
     }
 
     @Delete('/:id')

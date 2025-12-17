@@ -1,9 +1,10 @@
 import { Type } from "class-transformer"
-import { IsNotEmpty, IsNumber, IsOptional } from "class-validator"
+import { IsNotEmpty, IsNumber, IsOptional, IsUrl } from "class-validator"
 import { PaginationQueryParams } from "types/pagination/pagination.dto"
 
 export class FontPostDto {
     @IsNotEmpty()
+    @IsUrl()
     url: string
 
     @IsNotEmpty()
@@ -14,7 +15,17 @@ export class FontPostDto {
 }
 
 export class FontUpdateDto {
+    @IsOptional()
+    @IsUrl()
+    url: string
 
+    @IsOptional()
+    name: string
+    
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    adapterId: number
 }
 
 export class FontPaginationQueryDto extends PaginationQueryParams {
@@ -22,6 +33,7 @@ export class FontPaginationQueryDto extends PaginationQueryParams {
     name: string
 
     @IsOptional()
+    @IsUrl()
     url: string
 
     @IsOptional()
