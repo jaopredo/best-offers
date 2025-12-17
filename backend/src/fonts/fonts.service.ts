@@ -82,7 +82,7 @@ export class FontService {
         return await this.fontRepository.save(foundFont)
     }
 
-    async pop(font: Font) {
-        await this.fontRepository.remove({...font})
+    async pop(id: number) {
+        await this.fontRepository.delete({ id })
     }
 }
