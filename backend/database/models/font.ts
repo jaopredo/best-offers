@@ -20,9 +20,7 @@ export class Font {
     @Column()
     name: string
 
-    @OneToOne(() => Adapter, {
-        onDelete: 'CASCADE'
-    })
+    @OneToOne(() => Adapter)
     @JoinColumn()
     adapter: Adapter
 

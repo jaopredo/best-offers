@@ -23,6 +23,7 @@ export default async function e2eSetup() {
             transform: true,
             transformOptions: {
                 enableImplicitConversion: true,
+                exposeUnsetFields: false,
             },
         })
     )

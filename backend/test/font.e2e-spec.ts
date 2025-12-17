@@ -267,16 +267,19 @@ describe('Font (e2e)', () => {
 
         it('Pegar várias fontes (Com banco vazio)', async () => {
             const res = await userRequest(request(app.getHttpServer()).get(`/font`))
+                .query({
+                    name: 'Foo'
+                })
                 .expect(200)
             
             expect(Array.isArray(res.body.data)).toBe(true)
-            expect(res.body.data).toEqual([])
+            expect(res.body.data).toHaveLength(1)
 
             expect(res.body.meta).toEqual(
                 expect.objectContaining({
                     page: 1,
                     limit: 10,
-                    total: 0,
+                    total: 1,
                     totalPages: 1
                 })
             )
@@ -402,7 +405,7 @@ describe('Font (e2e)', () => {
         it('Deleta uma fonte', async () => {
             const res = await adminRequest(request(app.getHttpServer()).delete(`/font/${font1.id}`))
                 .expect(200)
-            
+
             expect(res.body).toEqual(
                 expect.objectContaining({
                     message: expect.any(String),
@@ -415,10 +418,6 @@ describe('Font (e2e)', () => {
             const getFontRes = await adminRequest(request(app.getHttpServer()).get(`/font/${font1.id}`))
                 .expect(404)
             validateError(getFontRes.body, 404)
-
-            const getAdapterRes = await adminRequest(request(app.getHttpServer()).get(`/adapter/${adapter1.id}`))
-                .expect(404)
-            validateError(getAdapterRes.body, 404)
         })
 
         it('Tenta acessar com token de usuário', async() => {
