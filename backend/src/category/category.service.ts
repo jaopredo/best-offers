@@ -47,7 +47,7 @@ export class CategoryService {
         }
     }
 
-    async update(id: number, category: CategoryPostDto) {
+    async update(id: number, category: Partial<CategoryPostDto>) {
         const updatedCategory = await this.categoryRepository.preload({
             id: id,
             ...category

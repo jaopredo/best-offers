@@ -11,7 +11,13 @@ export class Adapter {
     id: number
 
     @Column()
-    searchFormClassName: string
+    searchURL: string
+    
+    @Column({ nullable: true })
+    searchParameter: string
+
+    @Column()
+    sep: string
 
     @Column()
     itemURLClassName: string
