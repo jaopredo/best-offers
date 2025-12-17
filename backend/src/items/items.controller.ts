@@ -83,7 +83,15 @@ export class ItemController {
     @Patch('/:id')
     @Roles(['admin'])
     async patch(@Param('id', ParseIntPipe) id: number, @Body() item: ItemUpdateDto) {
-        throw new NotImplementedException()
+        const updatedItem = await this.itemService.update(id, item)
+
+        if (!updatedItem) throw new NotFoundException('Ou o item, ou a fonte, ou a categoria especificados não foram encontrados')
+
+        return {
+            message: 'Item atualizado com sucesso',
+            statusCode: 200,
+            item: updatedItem
+        }
     }
 
     @Delete('/:id')

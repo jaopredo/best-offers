@@ -207,11 +207,6 @@ describe('Item (e2e)', () => {
                 })
                 .expect(201)
             
-            let fontResponse = {
-                ...font
-            }
-            delete fontResponse.adapter
-            
             expect(res.body).toEqual(
                 expect.objectContaining({
                     message: expect.any(String),
@@ -219,9 +214,7 @@ describe('Item (e2e)', () => {
                     item: {
                         id: expect.any(Number),
                         ...itemBody,
-                        font: {
-                            ...fontResponse,
-                        },
+                        font: font,
                         category: category
                     }
                 })
@@ -374,6 +367,9 @@ describe('Item (e2e)', () => {
                 })
                 .expect(200)
             
+            console.log(res.body)
+            console.log(item)
+            
             // Validando o corpo da requisição
             expect(res.body).toEqual(
                 expect.objectContaining({
@@ -392,7 +388,7 @@ describe('Item (e2e)', () => {
             
             expect(get_res.body).toStrictEqual({
                 ...item,
-                name: 'Mock Test'
+                name: 'Mock Item'
             })
         })
 
@@ -411,10 +407,7 @@ describe('Item (e2e)', () => {
                     statusCode: 200,
                     item: {
                         ...item,
-                        font: {
-                            ...font2,
-                            adapter: undefined
-                        }
+                        font: font2
                     }
                 })
             )
@@ -422,13 +415,9 @@ describe('Item (e2e)', () => {
             // Validando se foi atualizado
             const getRes = await userRequest(request(app.getHttpServer()).get(`/item/${item.id}`))
                 .expect(200)
-            
             expect(getRes.body).toStrictEqual({
                 ...item,
-                font: {
-                    ...font2,
-                    adapter: undefined
-                }
+                font: font2
             })
         })
 
