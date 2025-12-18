@@ -27,6 +27,31 @@ export class ScrapperController {
     @Roles(['admin'])
     @Post()
     async create(@Body() body: ScrapperPostDto) {
-        throw new NotImplementedException()
+        let createdJobs
+
+        if (body.font && body.adapter) {
+            // Inserindo o adaptador passado
+            const adapter = await this.adapterService.create(body.adapter)
+            const font = await this.fontService.create({
+                ...body.font,
+                adapterId: adapter.id
+            })
+
+            if (!font || !adapter) throw new BadRequestException('Não foi possível criar e fazer scrapping da fonte passada')
+            
+            createdJobs = await this.scrapperService.scrap(font)
+        } else if (body.fontId) {
+            const font = await this.fontService.get(body.fontId)
+
+            if (!font) throw new BadRequestException('Não foi possível criar e fazer scrapping da fonte passada')
+
+            createdJobs = await this.scrapperService.scrap(font)
+        }
+
+        return {
+            message: 'O trabalho de scrapping foi iniciado',
+            statusCode: 201,
+            job: createdJobs
+        }
     }
 }

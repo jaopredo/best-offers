@@ -8,7 +8,6 @@ import axios from 'axios'
 
 /* REPOSITÓRIOS */
 import { Font } from "database/models/font"
-import { Adapter } from "database/models/adapter"
 import { Category } from "database/models/category"
 
 
@@ -19,6 +18,6 @@ export class ScrapperService {
         @InjectQueue('scrapping') private scrappingQueue: Queue
     ){}
 
-    async scrap(font: Font, adapter: Adapter) {
+    async scrap(font: Font) {
     }
 }
