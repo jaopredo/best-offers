@@ -21,6 +21,9 @@ describe('Authentication (e2e)', () => {
     let job1: Record<string, unknown>
     let job2: Record<string, unknown>
 
+    let category1: Record<string, unknown>
+    let category2: Record<string, unknown>
+
     const fontBody = {
         url: 'http://mock-test.foo.com',
         name: 'Foo'
@@ -51,6 +54,13 @@ describe('Authentication (e2e)', () => {
         itemNameClassName: 'product-title',
         itemPriceClassName: 'product-price',
         itemSellerClassName: 'product-seller'
+    }
+
+    const category1Body = {
+        name: 'Higiêne'
+    }
+    const category2Body = {
+        name: 'Construção'
     }
 
     const userRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${userToken}`)
@@ -113,8 +123,17 @@ describe('Authentication (e2e)', () => {
                 adapter: adapter2Body
             })
         
+        // Regitrando as categorias que serão usadas nos scrapping
+        const { body: { category: category1Res } } = await adminRequest(request(app.getHttpServer()).post('/category'))
+            .send(category1Body)
+        const { body: { category: category2Res } } = await adminRequest(request(app.getHttpServer()).post('/category'))
+            .send(category2Body)
+        
         job1 = job1Res
         job2 = job2Res
+
+        category1 = category1Res
+        category2 = category2Res
     })
 
 
@@ -150,12 +169,20 @@ describe('Authentication (e2e)', () => {
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 201,
-                    job: {
-                        id: expect.any(Number),
-                        status: expect.stringMatching(/^(running|failed|success)$/),
-                        font: font,
-                        adapter: adapter
-                    }
+                    jobs: [
+                        {
+                            id: expect.any(Number),
+                            status: expect.stringMatching(/^(running|failed|success)$/),
+                            font: font,
+                            category: category1
+                        },
+                        {
+                            id: expect.any(Number),
+                            status: expect.stringMatching(/^(running|failed|success)$/),
+                            font: font,
+                            category: category2
+                        }
+                    ]
                 })
             )
 
@@ -171,19 +198,39 @@ describe('Authentication (e2e)', () => {
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 201,
-                    job: {
-                        id: expect.any(Number),
-                        status: expect.stringMatching(/^(running|failed|success)$/),
-                        font: {
+                    jobs: [
+                        {
                             id: expect.any(Number),
-                            ...font2Body
+                            status: expect.stringMatching(/^(running|failed|success)$/),
+                            font: {
+                                id: expect.any(Number),
+                                ...font2Body,
+                                adapter: {
+                                    id: expect.any(Number),
+                                    ...adapter2Body
+                                }
+                            },
+                            category: category1
+                        },
+                        {
+                            id: expect.any(Number),
+                            status: expect.stringMatching(/^(running|failed|success)$/),
+                            font: {
+                                id: expect.any(Number),
+                                ...font2Body,
+                                adapter: {
+                                    id: expect.any(Number),
+                                    ...adapter2Body
+                                }
+                            },
+                            category: category2
                         }
-                    }
+                    ]
                 })
             )
 
-            let font2 = secondTypeRes.body.job.font
-            let adapter2 = secondTypeRes.body.job.adapter
+            let font2 = secondTypeRes.body.jobs[0].font
+            let adapter2 = secondTypeRes.body.jobs[0].font.adapter
 
             // Ele deve registrar a fonte e o adapter que foram enviados
             const getFontRes = await adminRequest(request(app.getHttpServer()).get(`/font/${font2.id}`))
