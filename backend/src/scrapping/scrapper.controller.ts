@@ -1,6 +1,4 @@
-import { BadRequestException, Body, Controller, Post, UseGuards } from "@nestjs/common"
-import { InjectQueue } from "@nestjs/bullmq"
-import { Queue } from "bullmq"
+import { BadRequestException, Body, Controller, NotImplementedException, Post, UseGuards } from "@nestjs/common"
 
 /* SERVIÇOS */
 import { ScrapperService } from "./scrapper.service"
@@ -18,7 +16,7 @@ import type { ScrapperPostDto } from "types/scrapper/scrapper.dto"
 
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('/scrapper')
+@Controller('/scrapping')
 export class ScrapperController {
     constructor(
         private adapterService: AdapterService,
@@ -29,5 +27,6 @@ export class ScrapperController {
     @Roles(['admin'])
     @Post()
     async create(@Body() body: ScrapperPostDto) {
+        throw new NotImplementedException()
     }
 }
