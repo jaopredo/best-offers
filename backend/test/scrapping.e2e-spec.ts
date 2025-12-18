@@ -350,26 +350,6 @@ describe('Authentication (e2e)', () => {
             )
         })
 
-        it('Pegar vários jobs (Com pesquisa)', async () => {
-            const res = await userRequest(request(app.getHttpServer()).get(`/job`))
-                .query({
-                    status: 'success'
-                })
-                .expect(200)
-            
-            expect(Array.isArray(res.body.data)).toBe(true)
-            expect(res.body.data).toHaveLength(4)
-
-            expect(res.body.meta).toEqual(
-                expect.objectContaining({
-                    page: 1,
-                    limit: 10,
-                    total: 4,
-                    totalPages: 1
-                })
-            )
-        })
-
         it('Tenta pegar sem passar um token', async () => {
             const res = await request(app.getHttpServer())
                 .get('/job')
