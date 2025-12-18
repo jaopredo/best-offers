@@ -17,7 +17,6 @@ export class ScrapperProcessor extends WorkerHost {
         @InjectRepository(JobModel) private jobRepository: Repository<JobModel>,
         private readonly scrapperLogic: ScrapperLogic,
     ){
-    
         super()
     }
 
