@@ -37,7 +37,11 @@ export class JobController {
 
     @Get('/:id')
     async get(@Param('id', ParseIntPipe) id: number) {
-        throw new NotImplementedException()
+        const foundJob = await this.jobService.get(id)
+
+        if (!foundJob) throw new NotFoundException('Categoria solicitada não encontrada')
+
+        return foundJob
     }
 
     @Get()

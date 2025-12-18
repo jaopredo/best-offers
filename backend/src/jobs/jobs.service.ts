@@ -18,6 +18,10 @@ export class JobService {
 
     // Fazendo overloads para a tipagem
     async get(id: number) {
+        return await this.jobRepository.findOne({
+            where: { id: id },
+            relations: ['font', 'font.adapter', 'category']
+        })
     }
 
     async getAll(limit: number, page: number, category?: Partial<Job>) {
