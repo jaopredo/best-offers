@@ -22,11 +22,11 @@ export class ScrapperProcessor extends WorkerHost {
 
     async process(job: Job<ScrapperProcessorData, any, string>): Promise<any> {
         const { data } = job
-        this.logger.log(`JOB ${data.id} associado à fonte ${data.font.name} e categoria ${data.category.name} INICIADO`)
+        this.logger.log(`JOB ${data.id}.${data.font.id}.${data.category.id} INICIADO`)
         
         await this.scrapperLogic.scrap(data)
 
         await this.jobRepository.update({ id: data.id }, { status: JobStatusEnum.SUCCESS })
-        this.logger.log(`JOB ${data.id} associado à fonte ${data.font.name} e categoria ${data.category.name} FINALIZADO`)
+        this.logger.log(`JOB ${data.id}.${data.font.id}.${data.category.id} FINALIZADO`)
     }
 }

@@ -1,25 +1,26 @@
-import type { Adapter } from "database/models/adapter"
 import type { Category } from "database/models/category"
 import type { Font } from "database/models/font"
 
-import { FontPostDto } from "../font/font.dto"
+import { FontScrapperPostDto } from "../font/font.dto"
 import { AdapterPostDto } from "../adapter/adapter.dto"
-import { IsNumber, ValidateIf, ValidateNested } from "class-validator"
+import { IsNotEmpty, IsNumber, IsObject, IsOptional, ValidateIf, ValidateNested } from "class-validator"
 import { Type } from "class-transformer"
 
 
 export class ScrapperPostDto {
-    @ValidateIf(o => o.fontId == null)
+    @IsOptional()
+    @IsObject()
     @ValidateNested()
-    @Type(() => FontPostDto)
-    font?: FontPostDto
+    @Type(() => FontScrapperPostDto)
+    font?: FontScrapperPostDto
 
-    @ValidateIf(o => o.fontId == null)
+    @IsOptional()
+    @IsObject()
     @ValidateNested()
     @Type(() => AdapterPostDto)
     adapter?: AdapterPostDto
 
-    @ValidateIf(o => o.font == null && o.adapter == null)
+    @IsOptional()
     @IsNumber()
     fontId?: number
 }

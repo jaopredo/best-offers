@@ -2,9 +2,7 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    OneToMany
 } from "typeorm"
-import { Job } from "./job"
 
 
 @Entity()
@@ -33,6 +31,6 @@ export class Adapter {
     @Column()
     itemPriceClassName: string
 
-    @Column()
-    itemSellerClassName: string
+    @Column({ type: 'varchar', nullable: true })
+    itemSellerClassName: string|null
 }

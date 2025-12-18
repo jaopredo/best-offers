@@ -12,7 +12,7 @@ import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
 import { Roles } from "src/decorators/roles.decorator"
 
 /* TIPOS */
-import type { ScrapperPostDto } from "types/scrapper/scrapper.dto"
+import { ScrapperPostDto } from "types/scrapper/scrapper.dto"
 import { Job } from "database/models/job"
 
 

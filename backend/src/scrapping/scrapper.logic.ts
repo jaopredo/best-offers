@@ -33,6 +33,7 @@ export class ScrapperLogic {
 
         if (!url) {
             await this.jobRepository.update({ id }, { status: JobStatusEnum.FAILED })
+            this.logger.error(`JOB ${id}.${font.id}.${category.id}: Erro na construção da URL`)
             return
         }
 
@@ -52,12 +53,15 @@ export class ScrapperLogic {
             const itemName = $element.find(`.${font.adapter.itemNameClassName}`).text().trim()
             let price = $element.find(`.${font.adapter.itemPriceClassName}`).text().trim().match(moneyRegex)
             const itemPrice = price ? Number(price[0].replace(/R\$\s*/, '').replace(/\./g, '').replace(',', '.')) : NaN
-            const itemSeller = $element.find(`.${font.adapter.itemSellerClassName}`).text().trim() ?? null
+            let itemSeller: string|null = null
+            if (font.adapter.itemSellerClassName) {
+                itemSeller = $element.find(`.${font.adapter.itemSellerClassName}`).text().trim() ?? null
+            }
             const itemURL = $element.find(`.${font.adapter.itemURLClassName}`).attr('href')
 
             // Campos obrigatórios de ter
             if (Number.isNaN(itemPrice) || !itemURL || !itemName) {
-                this.logger.error(`Job ${font.id}-${category.id}: Item rejeitado por não ter preço, url ou nome`)
+                this.logger.error(`JOB ${id}.${font.id}.${category.id}: Item rejeitado por não ter preço, url ou nome`)
                 return
             }
 
@@ -71,7 +75,7 @@ export class ScrapperLogic {
 
             // Salvando as promises para resolvê-las antes de acabar a requisição
             promises.push(this.itemRepository.save(item))
-            this.logger.log(`Job ${font.id}-${category.id}: Item adicionado`)
+            this.logger.log(`Job ${id}.${font.id}.${category.id}: Item adicionado`)
         })
         await Promise.all(promises)
     }

@@ -14,6 +14,15 @@ export class FontPostDto {
     adapterId: number
 }
 
+export class FontScrapperPostDto {
+    @IsNotEmpty()
+    @IsUrl()
+    url: string
+
+    @IsNotEmpty()
+    name: string
+}
+
 export class FontUpdateDto {
     @IsOptional()
     @IsUrl()

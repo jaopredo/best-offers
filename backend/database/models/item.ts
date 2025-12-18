@@ -25,8 +25,8 @@ export class Item {
     @Column({ type: 'text' })
     url: string
 
-    @Column({ nullable: true })
-    seller: string
+    @Column({ type: 'varchar', nullable: true })
+    seller: string|null
 
     @ManyToOne(() => Category, (category) => category.items, {
         nullable: false
