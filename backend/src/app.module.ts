@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AdapterModule } from './adapter/adapter.module'
 import { FontModule } from './fonts/font.module'
+import { ItemModule } from './items/items.module'
+import { ScrapperModule } from './scrapping/scrapper.module'
 
 /* MÓDULOS */
 import { AuthModule } from './auth/auth.module'
@@ -14,7 +16,7 @@ import { Font } from 'database/models/font'
 import { Adapter } from 'database/models/adapter'
 import { Category } from 'database/models/category'
 import { Item } from 'database/models/item'
-import { ItemModule } from './items/items.module'
+import { BullModule } from '@nestjs/bullmq'
 
 
 @Module({
@@ -24,6 +26,7 @@ import { ItemModule } from './items/items.module'
         AdapterModule,
         FontModule,
         ItemModule,
+        ScrapperModule,
         ConfigModule.forRoot({
             isGlobal: true
         }),
@@ -39,6 +42,15 @@ import { ItemModule } from './items/items.module'
                 entities: [ User, Font, Adapter, Category, Item ],
                 synchronize: config.get('NODE_ENV') != 'production',
                 logging: false,
+            })
+        }),
+        BullModule.forRootAsync({
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => ({
+                connection: {
+                    host: config.get('REDIS_HOST'),
+                    port: config.get<number>('REDIS_PORT')
+                }
             })
         })
     ]
