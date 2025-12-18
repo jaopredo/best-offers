@@ -26,7 +26,7 @@ export class ScrapperPostDto {
 
 
 export class ScrapperProcessorData {
+    id: number
     font: Font
-    adapter: Adapter
     category: Category
 }

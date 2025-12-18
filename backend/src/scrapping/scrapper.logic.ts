@@ -8,16 +8,17 @@ import { ScrapperProcessorData } from "types/scrapper/scrapper.dto"
 /* REPOSITÓRIOS */
 import { Item } from "database/models/item"
 import { InjectRepository } from "@nestjs/typeorm"
+import { Job } from "database/models/job"
 
 
 @Injectable()
 export class ScrapperLogic {
-    logger = new Logger(ScrapperLogic.name)
-
     constructor(
         @InjectRepository(Item) private itemRepository: Repository<Item>,
+        @InjectRepository(Job) private jobRepository: Repository<Job>,
     ) {}
 
     async scrap(data: ScrapperProcessorData) {
+        // Scrap logic
     }
 }

@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BullModule } from '@nestjs/bullmq'
+import { AuthModule } from 'src/auth/auth.module'
 
 /* CONTROLLERS */
 import { ScrapperController } from './scrapper.controller'
@@ -18,13 +20,12 @@ import { Font } from 'database/models/font'
 import { Adapter } from 'database/models/adapter'
 import { Category } from 'database/models/category'
 import { Item } from 'database/models/item'
-import { BullModule } from '@nestjs/bullmq'
-import { AuthModule } from 'src/auth/auth.module';
+import { Job } from 'database/models/job';
 
 @Module({
     imports: [
         AuthModule,
-        TypeOrmModule.forFeature([Font, Adapter, Category, Item]),
+        TypeOrmModule.forFeature([Font, Adapter, Category, Item, Job]),
         BullModule.registerQueue({
             name: 'scrapping',
         })

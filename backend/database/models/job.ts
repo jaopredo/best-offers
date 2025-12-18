@@ -8,8 +8,8 @@ import {
     ManyToOne
 } from "typeorm"
 import { Font } from "./font"
-import { Adapter } from "./adapter"
 import { JobStatusEnum } from "types/job/job.dto"
+import { Category } from "./category"
 
 @Entity()
 export class Job {
@@ -28,8 +28,8 @@ export class Job {
     })
     font: Font
 
-    @ManyToOne(() => Adapter, (adapter) => adapter.jobs, {
+    @ManyToOne(() => Category, (category) => category.jobs, {
         nullable: false
     })
-    adapter: Adapter
+    category: Category
 }

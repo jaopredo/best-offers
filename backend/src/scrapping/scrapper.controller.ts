@@ -13,6 +13,7 @@ import { Roles } from "src/decorators/roles.decorator"
 
 /* TIPOS */
 import type { ScrapperPostDto } from "types/scrapper/scrapper.dto"
+import { Job } from "database/models/job"
 
 
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -27,7 +28,7 @@ export class ScrapperController {
     @Roles(['admin'])
     @Post()
     async create(@Body() body: ScrapperPostDto) {
-        let createdJobs
+        let createdJobs: Job[]
 
         if (body.font && body.adapter) {
             // Inserindo o adaptador passado
@@ -46,12 +47,14 @@ export class ScrapperController {
             if (!font) throw new BadRequestException('Não foi possível criar e fazer scrapping da fonte passada')
 
             createdJobs = await this.scrapperService.scrap(font)
+        } else {
+            throw new BadRequestException('Você não passou os parâmetros necessários para a requisição')
         }
 
         return {
             message: 'O trabalho de scrapping foi iniciado',
             statusCode: 201,
-            job: createdJobs
+            jobs: createdJobs
         }
     }
 }

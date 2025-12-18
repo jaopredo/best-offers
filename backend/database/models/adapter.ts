@@ -35,7 +35,4 @@ export class Adapter {
 
     @Column()
     itemSellerClassName: string
-
-    @OneToMany(() => Job, (job) => job.font)
-    jobs: Job[]
 }
