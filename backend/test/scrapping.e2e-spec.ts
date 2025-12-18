@@ -20,6 +20,8 @@ describe('Authentication (e2e)', () => {
     let adapter: Record<string, unknown>
     let job1: Record<string, unknown>
     let job2: Record<string, unknown>
+    let job3: Record<string, unknown>
+    let job4: Record<string, unknown>
 
     let category1: Record<string, unknown>
     let category2: Record<string, unknown>
@@ -109,28 +111,30 @@ describe('Authentication (e2e)', () => {
         const resFontAdapterRegister = await registerFontAdapter(fontBody, adapterBody)
         font = resFontAdapterRegister.font
         adapter = resFontAdapterRegister.adapter
-        
-        // Registrando também dois jobs que serão utilizados para os testes
-        // de GET, PATCH e DELETE
-        const { body: { job: job1Res } } = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
-            .send({
-                fontId: font.id
-            })
 
-        const { body: { job: job2Res } } = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
-            .send({
-                font: font2Body,
-                adapter: adapter2Body
-            })
-        
         // Regitrando as categorias que serão usadas nos scrapping
         const { body: { category: category1Res } } = await adminRequest(request(app.getHttpServer()).post('/category'))
             .send(category1Body)
         const { body: { category: category2Res } } = await adminRequest(request(app.getHttpServer()).post('/category'))
             .send(category2Body)
         
-        job1 = job1Res
-        job2 = job2Res
+        // Registrando também dois jobs que serão utilizados para os testes
+        // de GET, PATCH e DELETE
+        const { body: { jobs: jobs1Res } } = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
+            .send({
+                fontId: font.id
+            })
+
+        const { body: { jobs: jobs2Res } } = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
+            .send({
+                font: font2Body,
+                adapter: adapter2Body
+            })
+        
+        job1 = jobs1Res[0]
+        job2 = jobs1Res[1]
+        job3 = jobs2Res[0]
+        job4 = jobs2Res[1]
 
         category1 = category1Res
         category2 = category2Res
@@ -284,7 +288,12 @@ describe('Authentication (e2e)', () => {
     describe('(GET) /job/:id', () => {
         it('Deve pegar as informações de um job', async () => {
             const res = await userRequest(request(app.getHttpServer()).get(`/job/${job1.id}`))
-            expect(res.body).toStrictEqual(job1)
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    ...job1,
+                    status: expect.stringMatching(/^(running|failed|success)$/)
+                })
+            )
         })
 
         it('Tenta acessar sem nenhum token', async () => {

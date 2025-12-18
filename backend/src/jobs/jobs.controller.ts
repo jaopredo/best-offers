@@ -29,7 +29,7 @@ import { JobService } from "./jobs.service"
 
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('/category')
+@Controller('/job')
 export class JobController {
     constructor(
         private jobService: JobService
