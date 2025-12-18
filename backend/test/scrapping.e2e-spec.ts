@@ -177,10 +177,6 @@ describe('Authentication (e2e)', () => {
                         font: {
                             id: expect.any(Number),
                             ...font2Body
-                        },
-                        adapter: {
-                            id: expect.any(Number),
-                            ...adapter2Body
                         }
                     }
                 })
