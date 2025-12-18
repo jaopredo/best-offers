@@ -7,6 +7,9 @@ import { getUserAuthToken, getAdminAuthToken } from './helpers/auth'
 import { seedAdmin } from './helpers/seed-admin'
 import { ConfigService } from '@nestjs/config'
 import { DataSource } from 'typeorm'
+import axios from 'axios'
+import * as fs from 'fs'
+import * as path from 'path'
 
 describe('Authentication (e2e)', () => {
     let app: INestApplication<App>
@@ -160,8 +163,18 @@ describe('Authentication (e2e)', () => {
         await app.close()
     })
 
+    // Carregando as páginas mock
+    const searchPage = fs.readFileSync(
+        path.join(__dirname, 'mocks/search.html'),
+        'utf-8'
+    )
+
     describe('(POST) /scrapping', () => {
         it('Deve mandar dois tipos de informações e fazer scrapping dos itens', async () => {
+            jest.spyOn(axios, 'get').mockResolvedValue({
+                data: searchPage
+            })
+
             // Mandando as informações de uma fonte que já existe
             const firstTypeRes = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
                 .send({
