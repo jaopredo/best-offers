@@ -1,8 +1,10 @@
 import {
     Entity,
     PrimaryGeneratedColumn,
-    Column
+    Column,
+    OneToMany
 } from "typeorm"
+import { Job } from "./job"
 
 
 @Entity()
@@ -33,4 +35,7 @@ export class Adapter {
 
     @Column()
     itemSellerClassName: string
+
+    @OneToMany(() => Job, (job) => job.font)
+    jobs: Job[]
 }

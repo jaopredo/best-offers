@@ -5,6 +5,8 @@ import { AdapterModule } from './adapter/adapter.module'
 import { FontModule } from './fonts/font.module'
 import { ItemModule } from './items/items.module'
 import { ScrapperModule } from './scrapping/scrapper.module'
+import { BullModule } from '@nestjs/bullmq'
+import { JobModule } from './jobs/jobs.module'
 
 /* MÓDULOS */
 import { AuthModule } from './auth/auth.module'
@@ -16,7 +18,7 @@ import { Font } from 'database/models/font'
 import { Adapter } from 'database/models/adapter'
 import { Category } from 'database/models/category'
 import { Item } from 'database/models/item'
-import { BullModule } from '@nestjs/bullmq'
+import { Job } from 'database/models/job'
 
 
 @Module({
@@ -27,6 +29,7 @@ import { BullModule } from '@nestjs/bullmq'
         FontModule,
         ItemModule,
         ScrapperModule,
+        JobModule,
         ConfigModule.forRoot({
             isGlobal: true
         }),
@@ -39,7 +42,7 @@ import { BullModule } from '@nestjs/bullmq'
                 username: config.get('DB_USER'),
                 password: config.get('DB_PASSWORD'),
                 database: config.get('DB_DB'),
-                entities: [ User, Font, Adapter, Category, Item ],
+                entities: [ User, Font, Adapter, Category, Item, Job ],
                 synchronize: config.get('NODE_ENV') != 'production',
                 logging: false,
             })
