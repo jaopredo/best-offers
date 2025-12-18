@@ -59,7 +59,7 @@ services:
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: offers-dev
+            POSTGRES_DB: offers
         volumes:
             - postgres_data:/var/lib/postgresql/
         ports:
@@ -96,7 +96,7 @@ services:
     redis-dev:
         image: redis:7
         container_name: redis.dev
-        profiles: ["prod"]
+        profiles: ["dev"]
         ports:
             - "6379:6379"
         volumes:
@@ -105,7 +105,7 @@ services:
     n8n-dev:
         container_name: n8n.dev
         image: docker.n8n.io/n8nio/n8n
-        profiles: ["prod"]
+        profiles: ["dev"]
         volumes:
             - n8n_data:/home/node/.n8n
         ports:

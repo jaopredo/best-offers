@@ -9,7 +9,6 @@ import { CategoryPostDto } from "types/category/category.dto"
 import { Category } from "database/models/category"
 
 /* TIPOS */
-import { Pagination } from "types/pagination/pagination.dto"
 import { whereFormater } from "utils/whereFormater"
 
 

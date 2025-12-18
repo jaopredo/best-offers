@@ -1,7 +1,7 @@
 import {
     Entity,
     PrimaryGeneratedColumn,
-    Column
+    Column,
 } from "typeorm"
 
 
@@ -31,6 +31,6 @@ export class Adapter {
     @Column()
     itemPriceClassName: string
 
-    @Column()
-    itemSellerClassName: string
+    @Column({ type: 'varchar', nullable: true })
+    itemSellerClassName: string|null
 }

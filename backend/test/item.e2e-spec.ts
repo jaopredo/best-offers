@@ -367,9 +367,6 @@ describe('Item (e2e)', () => {
                 })
                 .expect(200)
             
-            console.log(res.body)
-            console.log(item)
-            
             // Validando o corpo da requisição
             expect(res.body).toEqual(
                 expect.objectContaining({

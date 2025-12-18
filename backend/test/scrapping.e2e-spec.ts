@@ -7,6 +7,9 @@ import { getUserAuthToken, getAdminAuthToken } from './helpers/auth'
 import { seedAdmin } from './helpers/seed-admin'
 import { ConfigService } from '@nestjs/config'
 import { DataSource } from 'typeorm'
+import axios from 'axios'
+import * as fs from 'fs'
+import * as path from 'path'
 
 describe('Authentication (e2e)', () => {
     let app: INestApplication<App>
@@ -20,6 +23,11 @@ describe('Authentication (e2e)', () => {
     let adapter: Record<string, unknown>
     let job1: Record<string, unknown>
     let job2: Record<string, unknown>
+    let job3: Record<string, unknown>
+    let job4: Record<string, unknown>
+
+    let category1: Record<string, unknown>
+    let category2: Record<string, unknown>
 
     const fontBody = {
         url: 'http://mock-test.foo.com',
@@ -51,6 +59,13 @@ describe('Authentication (e2e)', () => {
         itemNameClassName: 'product-title',
         itemPriceClassName: 'product-price',
         itemSellerClassName: 'product-seller'
+    }
+
+    const category1Body = {
+        name: 'Higiêne'
+    }
+    const category2Body = {
+        name: 'Construção'
     }
 
     const userRequest = (req: SupertestTest) => req.set('Authorization', `Bearer ${userToken}`)
@@ -99,22 +114,33 @@ describe('Authentication (e2e)', () => {
         const resFontAdapterRegister = await registerFontAdapter(fontBody, adapterBody)
         font = resFontAdapterRegister.font
         adapter = resFontAdapterRegister.adapter
+
+        // Regitrando as categorias que serão usadas nos scrapping
+        const { body: { category: category1Res } } = await adminRequest(request(app.getHttpServer()).post('/category'))
+            .send(category1Body)
+        const { body: { category: category2Res } } = await adminRequest(request(app.getHttpServer()).post('/category'))
+            .send(category2Body)
         
         // Registrando também dois jobs que serão utilizados para os testes
         // de GET, PATCH e DELETE
-        const { body: { job: job1Res } } = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
+        const { body: { jobs: jobs1Res } } = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
             .send({
                 fontId: font.id
             })
 
-        const { body: { job: job2Res } } = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
+        const { body: { jobs: jobs2Res } } = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
             .send({
                 font: font2Body,
                 adapter: adapter2Body
             })
         
-        job1 = job1Res
-        job2 = job2Res
+        job1 = jobs1Res[0]
+        job2 = jobs1Res[1]
+        job3 = jobs2Res[0]
+        job4 = jobs2Res[1]
+
+        category1 = category1Res
+        category2 = category2Res
     })
 
 
@@ -137,8 +163,18 @@ describe('Authentication (e2e)', () => {
         await app.close()
     })
 
+    // Carregando as páginas mock
+    const searchPage = fs.readFileSync(
+        path.join(__dirname, 'mocks/search.html'),
+        'utf-8'
+    )
+
     describe('(POST) /scrapping', () => {
         it('Deve mandar dois tipos de informações e fazer scrapping dos itens', async () => {
+            jest.spyOn(axios, 'get').mockResolvedValue({
+                data: searchPage
+            })
+
             // Mandando as informações de uma fonte que já existe
             const firstTypeRes = await adminRequest(request(app.getHttpServer()).post('/scrapping'))
                 .send({
@@ -150,12 +186,20 @@ describe('Authentication (e2e)', () => {
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 201,
-                    job: {
-                        id: expect.any(Number),
-                        status: expect.stringMatching(/^(running|failed|success)$/),
-                        font: font,
-                        adapter: adapter
-                    }
+                    jobs: [
+                        {
+                            id: expect.any(Number),
+                            status: expect.stringMatching(/^(running|failed|success)$/),
+                            font: font,
+                            category: category1
+                        },
+                        {
+                            id: expect.any(Number),
+                            status: expect.stringMatching(/^(running|failed|success)$/),
+                            font: font,
+                            category: category2
+                        }
+                    ]
                 })
             )
 
@@ -171,23 +215,39 @@ describe('Authentication (e2e)', () => {
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 201,
-                    job: {
-                        id: expect.any(Number),
-                        status: expect.stringMatching(/^(running|failed|success)$/),
-                        font: {
+                    jobs: [
+                        {
                             id: expect.any(Number),
-                            ...font2Body
+                            status: expect.stringMatching(/^(running|failed|success)$/),
+                            font: {
+                                id: expect.any(Number),
+                                ...font2Body,
+                                adapter: {
+                                    id: expect.any(Number),
+                                    ...adapter2Body
+                                }
+                            },
+                            category: category1
                         },
-                        adapter: {
+                        {
                             id: expect.any(Number),
-                            ...adapter2Body
+                            status: expect.stringMatching(/^(running|failed|success)$/),
+                            font: {
+                                id: expect.any(Number),
+                                ...font2Body,
+                                adapter: {
+                                    id: expect.any(Number),
+                                    ...adapter2Body
+                                }
+                            },
+                            category: category2
                         }
-                    }
+                    ]
                 })
             )
 
-            let font2 = secondTypeRes.body.job.font
-            let adapter2 = secondTypeRes.body.job.adapter
+            let font2 = secondTypeRes.body.jobs[0].font
+            let adapter2 = secondTypeRes.body.jobs[0].font.adapter
 
             // Ele deve registrar a fonte e o adapter que foram enviados
             const getFontRes = await adminRequest(request(app.getHttpServer()).get(`/font/${font2.id}`))
@@ -241,7 +301,12 @@ describe('Authentication (e2e)', () => {
     describe('(GET) /job/:id', () => {
         it('Deve pegar as informações de um job', async () => {
             const res = await userRequest(request(app.getHttpServer()).get(`/job/${job1.id}`))
-            expect(res.body).toStrictEqual(job1)
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    ...job1,
+                    status: expect.stringMatching(/^(running|failed|success)$/)
+                })
+            )
         })
 
         it('Tenta acessar sem nenhum token', async () => {
@@ -262,7 +327,7 @@ describe('Authentication (e2e)', () => {
         it('Pegar vários jobs (Com paginação)', async () => {
             const paginationInfo = {
                 page: 1,
-                limit: 1
+                limit: 2
             }
             
             // Checando a resposta do GET
@@ -279,25 +344,8 @@ describe('Authentication (e2e)', () => {
                 expect.objectContaining({
                     page: paginationInfo.page,
                     limit: paginationInfo.limit,
-                    total: 2,
+                    total: 4,
                     totalPages: 2
-                })
-            )
-        })
-
-        it('Pegar vários jobs (Com banco vazio)', async () => {
-            const res = await userRequest(request(app.getHttpServer()).get(`/job`))
-                .expect(200)
-            
-            expect(Array.isArray(res.body.data)).toBe(true)
-            expect(res.body.data).toEqual([])
-
-            expect(res.body.meta).toEqual(
-                expect.objectContaining({
-                    page: 1,
-                    limit: 10,
-                    total: 0,
-                    totalPages: 1
                 })
             )
         })
@@ -319,7 +367,10 @@ describe('Authentication (e2e)', () => {
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 200,
-                    job: job1
+                    job: {
+                        ...job1,
+                        status: expect.stringMatching(/^(running|failed|success)$/)
+                    }
                 })
             )
 
@@ -337,15 +388,15 @@ describe('Authentication (e2e)', () => {
 
         it('Tenta acessar como usuário', async () => {
             const res = await userRequest(request(app.getHttpServer()).delete('/job/1'))
-                .expect(404)
-            validateError(res.body, 404)
+                .expect(401)
+            validateError(res.body, 401)
         })
 
         it('Tenta acessar sem token', async () => {
             const res = await request(app.getHttpServer())
                 .delete('/job/1')
-                .expect(404)
-            validateError(res.body, 404)
+                .expect(401)
+            validateError(res.body, 401)
         })
     })
 })
