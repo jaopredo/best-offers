@@ -374,7 +374,10 @@ describe('Authentication (e2e)', () => {
                 expect.objectContaining({
                     message: expect.any(String),
                     statusCode: 200,
-                    job: job1
+                    job: {
+                        ...job1,
+                        status: expect.stringMatching(/^(running|failed|success)$/)
+                    }
                 })
             )
 
@@ -392,15 +395,15 @@ describe('Authentication (e2e)', () => {
 
         it('Tenta acessar como usuário', async () => {
             const res = await userRequest(request(app.getHttpServer()).delete('/job/1'))
-                .expect(404)
-            validateError(res.body, 404)
+                .expect(401)
+            validateError(res.body, 401)
         })
 
         it('Tenta acessar sem token', async () => {
             const res = await request(app.getHttpServer())
                 .delete('/job/1')
-                .expect(404)
-            validateError(res.body, 404)
+                .expect(401)
+            validateError(res.body, 401)
         })
     })
 })

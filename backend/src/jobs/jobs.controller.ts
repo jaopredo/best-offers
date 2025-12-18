@@ -42,7 +42,7 @@ export class JobController {
     async get(@Param('id', ParseIntPipe) id: number) {
         const foundJob = await this.jobService.get(id)
 
-        if (!foundJob) throw new NotFoundException('Categoria solicitada não encontrada')
+        if (!foundJob) throw new NotFoundException('Job solicitado não encontrado')
 
         return foundJob
     }
@@ -70,6 +70,14 @@ export class JobController {
     @Delete('/:id')
     @Roles(['admin'])
     async remove(@Param('id', ParseIntPipe) id: number) {
-        throw new NotImplementedException()
+        const job = await this.jobService.get(id)
+        if (!job) throw new NotFoundException('O job especificado não foi encontrado')
+        await this.jobService.pop(job.id)
+        
+        return {
+            message: 'Job deletado com sucesso',
+            statusCode: 200,
+            job
+        }
     }
 }

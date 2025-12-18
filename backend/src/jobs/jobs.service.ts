@@ -40,5 +40,6 @@ export class JobService {
     }
 
     async pop(id: number) {
+        await this.jobRepository.delete({ id: id })
     }
 }
