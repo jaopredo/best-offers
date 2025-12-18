@@ -27,6 +27,9 @@ import { JobPaginationQueryDto } from "types/job/job.dto"
 /* SERVIÇOS */
 import { JobService } from "./jobs.service"
 
+/* UTILS */
+import { cleanPagination } from "utils/paginationCleaner"
+
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('/job')
@@ -46,7 +49,22 @@ export class JobController {
 
     @Get()
     async getAll(@Query() query: JobPaginationQueryDto) {
-        throw new NotImplementedException()
+        const {
+            jobs,
+            count
+        } = await this.jobService.getAll(query.limit, query.page, {
+            status: query.status
+        })
+
+        return {
+            data: jobs,
+            meta: {
+                page: query.page,
+                limit: query.limit,
+                total: count,
+                totalPages: Math.ceil(count / query.limit)
+            }
+        }
     }
 
     @Delete('/:id')

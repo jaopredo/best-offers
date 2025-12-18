@@ -24,7 +24,19 @@ export class JobService {
         })
     }
 
-    async getAll(limit: number, page: number, category?: Partial<Job>) {
+    async getAll(limit: number, page: number, job?: Partial<Job>) {
+        const [ jobs, count ] = await this.jobRepository.findAndCount({
+            take: limit,
+            skip: (page-1)*limit,
+            where: {
+                status: job?.status
+            }
+        })
+
+        return {
+            jobs,
+            count
+        }
     }
 
     async pop(id: number) {
