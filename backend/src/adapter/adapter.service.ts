@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { FindOptionsWhere, Repository } from "typeorm"
 
 /* REPOSITÓRIOS */
-import { Adapter } from "database/models/adapter"
+import { Adapter } from "database/models/adapter.entity"
 
 /* DTO */
 import { AdapterPostDto } from "types/adapter/adapter.dto"

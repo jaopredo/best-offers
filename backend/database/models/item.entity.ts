@@ -4,8 +4,8 @@ import {
     Column,
     ManyToOne
 } from 'typeorm'
-import { Category } from './category'
-import { Font } from './font'
+import { Category } from './category.entity'
+import { Font } from './font.entity'
 
 
 @Entity()

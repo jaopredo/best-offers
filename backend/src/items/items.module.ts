@@ -8,10 +8,10 @@ import { ItemController } from './items.controller'
 import { ItemService } from './items.service'
 
 /* REPOSITÓRIOS */
-import { Item } from 'database/models/item'
-import { Category } from 'database/models/category'
-import { Font } from 'database/models/font'
-import { Adapter } from 'database/models/adapter'
+import { Item } from 'database/models/item.entity'
+import { Category } from 'database/models/category.entity'
+import { Font } from 'database/models/font.entity'
+import { Adapter } from 'database/models/adapter.entity'
 import { AuthModule } from 'src/auth/auth.module'
 
 @Module({

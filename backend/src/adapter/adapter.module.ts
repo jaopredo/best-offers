@@ -9,7 +9,7 @@ import { AdapterController } from './adapter.controller'
 import { AdapterService } from './adapter.service'
 
 /* REPOSITÓRIOS */
-import { Adapter } from 'database/models/adapter'
+import { Adapter } from 'database/models/adapter.entity'
 
 @Module({
     imports: [

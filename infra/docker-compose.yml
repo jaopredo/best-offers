@@ -13,17 +13,17 @@ services:
         ports:
             - "5432:5432"
     
-    backend-prod:
+    backend:
         container_name: backend
         profiles: ["prod"]
         build:
             context: ../backend
-        environment:
-            NODE_ENV: production
+        env_file:
+            - ../backend/.env.production.local
         ports:
             - 3000:3000
     
-    frontend-prod:
+    frontend:
         container_name: frontend
         profiles: ["prod"]
         build:

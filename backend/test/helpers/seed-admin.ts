@@ -1,6 +1,6 @@
 // test/helpers/seed-admin.ts
 import { DataSource } from 'typeorm'
-import { User } from 'database/models/user'
+import { User } from 'database/models/user.entity'
 import * as bcrypt from 'bcrypt'
 import { ConfigService } from '@nestjs/config'
 

@@ -3,8 +3,8 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { FindOptionsWhere, Repository } from "typeorm"
 
 /* REPOSITÓRIOS */
-import { Font } from "database/models/font"
-import { Adapter } from "database/models/adapter"
+import { Font } from "database/models/font.entity"
+import { Adapter } from "database/models/adapter.entity"
 
 /* DTO */
 import { FontPostDto } from "types/font/font.dto"

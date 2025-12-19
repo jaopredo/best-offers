@@ -9,8 +9,8 @@ import { FontController } from './font.controller'
 import { FontService } from './fonts.service'
 
 /* REPOSITÓRIOS */
-import { Font } from 'database/models/font'
-import { Adapter } from 'database/models/adapter'
+import { Font } from 'database/models/font.entity'
+import { Adapter } from 'database/models/adapter.entity'
 
 @Module({
     imports: [

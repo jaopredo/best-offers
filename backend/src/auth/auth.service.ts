@@ -4,7 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import bcrypt from 'bcrypt'
 
 /* ENTITIES */
-import { User } from "database/models/user"
+import { User } from "database/models/user.entity"
 
 /* TYPES */
 import type { FindOptionsWhere, Repository } from "typeorm"

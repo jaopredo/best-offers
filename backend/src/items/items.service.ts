@@ -6,9 +6,9 @@ import { FindOptionsWhere, Repository } from "typeorm"
 import { ItemPostDto, ItemUpdateDto } from "types/item/item.dto"
 
 /* REPOSITÓRIOS */
-import { Item } from "database/models/item"
-import { Font } from "database/models/font"
-import { Category } from "database/models/category"
+import { Item } from "database/models/item.entity"
+import { Font } from "database/models/font.entity"
+import { Category } from "database/models/category.entity"
 import { whereFormater } from "utils/whereFormater"
 
 

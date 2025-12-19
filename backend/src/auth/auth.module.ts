@@ -12,7 +12,7 @@ import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 
 /* REPOSITÓRIOS */
-import { User } from 'database/models/user'
+import { User } from 'database/models/user.entity'
 
 @Module({
     imports: [

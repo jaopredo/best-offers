@@ -6,7 +6,7 @@ import { Repository, ILike, FindOptionsWhere } from "typeorm"
 import { CategoryPostDto } from "types/category/category.dto"
 
 /* REPOSITÓRIOS */
-import { Category } from "database/models/category"
+import { Category } from "database/models/category.entity"
 
 /* TIPOS */
 import { Pagination } from "types/pagination/pagination.dto"

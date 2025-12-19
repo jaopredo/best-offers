@@ -6,8 +6,8 @@ import {
     JoinColumn,
     OneToMany
 } from "typeorm"
-import { Adapter } from "./adapter"
-import { Item } from "./item"
+import { Adapter } from "./adapter.entity"
+import { Item } from "./item.entity"
 
 @Entity()
 export class Font {

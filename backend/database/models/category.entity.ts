@@ -4,7 +4,7 @@ import {
     Column,
     OneToMany
 } from 'typeorm'
-import { Item } from './item'
+import { Item } from './item.entity'
 
 
 @Entity()

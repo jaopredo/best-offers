@@ -9,8 +9,8 @@ import { CategoryController } from './category.controller'
 import { CategoryService } from './category.service'
 
 /* REPOSITÓRIOS */
-import { Category } from 'database/models/category'
-import { Item } from 'database/models/item'
+import { Category } from 'database/models/category.entity'
+import { Item } from 'database/models/item.entity'
 
 @Module({
     imports: [
