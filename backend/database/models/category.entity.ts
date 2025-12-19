@@ -5,6 +5,7 @@ import {
     OneToMany
 } from 'typeorm'
 import { Item } from './item.entity'
+import { Job } from './job.entity'
 
 
 @Entity()
@@ -17,4 +18,7 @@ export class Category {
 
     @OneToMany(() => Item, (item) => item.category)
     items: Item[]
+
+    @OneToMany(() => Job, (job) => job.font)
+    jobs: Job[]
 }

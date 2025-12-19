@@ -4,6 +4,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AdapterModule } from './adapter/adapter.module'
 import { FontModule } from './fonts/font.module'
 import { ItemModule } from './items/items.module'
+import { ScrapperModule } from './scrapping/scrapper.module'
+import { BullModule } from '@nestjs/bullmq'
+import { JobModule } from './jobs/jobs.module'
 
 /* MÓDULOS */
 import { AuthModule } from './auth/auth.module'
@@ -24,6 +27,8 @@ import { CategoryModule } from './category/category.module'
         AdapterModule,
         FontModule,
         ItemModule,
+        ScrapperModule,
+        JobModule,
         ConfigModule.forRoot({
             isGlobal: true
         }),
@@ -40,6 +45,15 @@ import { CategoryModule } from './category/category.module'
                 // synchronize: config.get('NODE_ENV') != 'production',
                 synchronize: true,
                 logging: false,
+            })
+        }),
+        BullModule.forRootAsync({
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => ({
+                connection: {
+                    host: config.get('REDIS_HOST'),
+                    port: config.get<number>('REDIS_PORT')
+                }
             })
         })
     ]

@@ -11,11 +11,12 @@ import { FontService } from './fonts.service'
 /* REPOSITÓRIOS */
 import { Font } from 'database/models/font.entity'
 import { Adapter } from 'database/models/adapter.entity'
+import { Job } from 'database/models/job.entity'
 
 @Module({
     imports: [
         AuthModule,
-        TypeOrmModule.forFeature([Font, Adapter]),
+        TypeOrmModule.forFeature([Font, Adapter, Job]),
     ],
     controllers: [FontController],
     providers: [FontService],

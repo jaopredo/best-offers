@@ -8,6 +8,7 @@ import {
 } from "typeorm"
 import { Adapter } from "./adapter.entity"
 import { Item } from "./item.entity"
+import { Job } from "./job.entity"
 
 @Entity()
 export class Font {
@@ -26,4 +27,7 @@ export class Font {
 
     @OneToMany(() => Item, (item) => item.font)
     items: Item[]
+
+    @OneToMany(() => Job, (job) => job.font)
+    jobs: Job[]
 }

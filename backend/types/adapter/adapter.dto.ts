@@ -23,7 +23,7 @@ export class AdapterPostDto {
     @IsNotEmpty()
     itemPriceClassName: string
 
-    @IsNotEmpty()
+    @IsOptional()
     itemSellerClassName: string
 }
 

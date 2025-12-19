@@ -14,9 +14,6 @@ import {
     UseGuards
 } from "@nestjs/common"
 
-/* TIPOS */
-import { Pagination } from "types/pagination/pagination.dto"
-
 /* GUARDS */
 import { JwtAuthGuard, RolesGuard } from "src/auth/auth.guard"
 
