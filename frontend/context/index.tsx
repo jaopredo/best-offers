@@ -3,6 +3,7 @@ import type { ReactNode } from "react"
 
 /* PROVIDERS */
 import { APIProvider } from "./api"
+import { ThemeProvider } from "./theme"
 
 export default function ContextsProvider({ children }: { children: ReactNode }) {
     /**
@@ -10,7 +11,9 @@ export default function ContextsProvider({ children }: { children: ReactNode }) 
      */
     return (
         <APIProvider>
-            {children}
+            <ThemeProvider>
+                {children}
+            </ThemeProvider>
         </APIProvider>
     )
 }
