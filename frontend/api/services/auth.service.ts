@@ -6,7 +6,7 @@ import APISource from "../source"
 import { UserLoginInterface, UserRegisterInterface, AuthServiceInterface, UserApiResponse, User } from "@/types/api/services/auth.service"
 
 
-export default class UserService implements AuthServiceInterface {
+export default class AuthService implements AuthServiceInterface {
     source = new APISource('auth')
 
     async register (data: UserRegisterInterface) {
