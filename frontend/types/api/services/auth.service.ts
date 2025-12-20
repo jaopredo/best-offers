@@ -2,7 +2,7 @@ import { AxiosResponse } from "axios"
 import { APISourceInterface } from "../source"
 import { ApiDefaultResponse } from ".."
 
-export enum UserAccessEnum {
+export enum UserRolesEnum {
     ADMIN = 'admin',
     USER = 'user'
 }
@@ -27,8 +27,7 @@ export interface UserLoginInterface {
 export interface UserRegisterInterface {
     name: string,
     email: string,
-    password: string,
-    role: UserAccessEnum
+    password: string
 }
 
 export interface UserRegisterFormInterface extends UserRegisterInterface {
@@ -36,7 +35,9 @@ export interface UserRegisterFormInterface extends UserRegisterInterface {
 }
 
 /* INTERFACE DO USUÁRIO */
-export type User = Omit<UserRegisterInterface, 'password'>
+export type User = Omit<UserRegisterInterface, 'password'> & {
+    role: UserRolesEnum
+}
 
 
 /* INTERFACE DO SERVIÇO DE AUTENTIFICAÇÃO */
