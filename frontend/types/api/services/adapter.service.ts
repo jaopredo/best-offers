@@ -39,36 +39,36 @@ export interface AdapterServiceInterface {
     /**
      * Método para realizar o registro de um adapter no sistema
      * @param {AdapterRegisterInterface} data - As informações do novo adapter
-     * @returns {Promise<AdapterApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<AdapterApiResponse>>} - Promise com a resposta da requisição
      */
-    create (data: AdapterRegisterInterface): Promise<AdapterApiResponse>
+    create (data: AdapterRegisterInterface): Promise<AxiosResponse<AdapterApiResponse>>
 
     /**
      * Função para recuperar uma lista com todos os adapters no sistema
      * @param {Pagination} pagination - Objeto com as informações de paginação
-     * @returns {Promise<ApiPaginationResponse<Adapter>>} - A paginação dos adapters presentes no banco
+     * @returns {Promise<AxiosResponse<ApiPaginationResponse<Adapter>>>} - A paginação dos adapters presentes no banco
      */
-    getAll(pagination?: Pagination): Promise<ApiPaginationResponse<Adapter>>
+    getAll(pagination?: Pagination): Promise<AxiosResponse<ApiPaginationResponse<Adapter>>>
 
     /**
      * Função para recuperar um adapter em específico
      * @param {number} id - ID de um adapter específico
-     * @returns {Promise<AxiosResponse<Adapter>>} - O adapter especificado
+     * @returns {Promise<AxiosResponse<AdapterApiResponse>>} - O adapter especificado
      */
-    get(id: number): Promise<AxiosResponse<Adapter>>
+    get(id: number): Promise<AxiosResponse<AdapterApiResponse>>
 
     /**
      * Atualiza as informações de um adapter especificado
      * @param {number} id - ID do adapter que será atualizado
      * @param {AdapterUpdateInterface} data - Novas informações do adapter
-     * @returns {Promise<AdapterApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<AdapterApiResponse>>} - Promise com a resposta da requisição
      */
-    update(id: number, data: AdapterUpdateInterface): Promise<AdapterApiResponse>
+    update(id: number, data: AdapterUpdateInterface): Promise<AxiosResponse<AdapterApiResponse>>
 
     /**
      * Deleta um adapter baseado no ID passado
      * @param {number} id - ID do adapter que será deletado
-     * @returns {Promise<AdapterApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<AdapterApiResponse>>} - Promise com a resposta da requisição
      */
-    delete: (id: number) => Promise<AdapterApiResponse>
+    delete: (id: number) => Promise<AxiosResponse<AdapterApiResponse>>
 }

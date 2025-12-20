@@ -3,10 +3,10 @@ import { AxiosError, AxiosResponse } from "axios"
 /**
  * Interface padrão das respostas da API
  */
-export type ApiDefaultResponse<T = unknown> = AxiosResponse<({
+export type ApiDefaultResponse<T = {}> = {
     message: string|string[],
     statusCode: number
-}) & T>
+} & T
 
 export type ApiError = AxiosError<{
     message:string|string[],

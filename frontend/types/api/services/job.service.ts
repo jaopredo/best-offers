@@ -34,21 +34,21 @@ export interface JobServiceInterface {
     /**
      * Função para recuperar uma lista com todos os jobs no sistema
      * @param {Pagination} pagination - Objeto com as informações de paginação
-     * @returns {Promise<ApiPaginationResponse<Job>>} - A paginação dos jobs presentes no banco
+     * @returns {Promise<AxiosResponse<ApiPaginationResponse<Job>>>} - A paginação dos jobs presentes no banco
      */
-    getAll(pagination?: Pagination): Promise<ApiPaginationResponse<Job>>
+    getAll(pagination?: Pagination): Promise<AxiosResponse<ApiPaginationResponse<Job>>>
 
     /**
      * Função para recuperar um job em específico
      * @param {number} id - ID de um job específico
-     * @returns {Promise<AxiosResponse<Job>>} - O job especificado
+     * @returns {Promise<AxiosResponse<JobApiResponse>>} - O job especificado
      */
-    get(id: number): Promise<AxiosResponse<Job>>
+    get(id: number): Promise<AxiosResponse<JobApiResponse>>
 
     /**
      * Deleta um job baseado no ID passado
      * @param {number} id - ID do job que será deletado
-     * @returns {Promise<JobApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<JobApiResponse>>} - Promise com a resposta da requisição
      */
-    delete: (id: number) => Promise<JobApiResponse>
+    delete: (id: number) => Promise<AxiosResponse<JobApiResponse>>
 }

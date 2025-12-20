@@ -47,16 +47,17 @@ export interface AuthServiceInterface {
     /**
      * Método para realizar o registro de um usuário no sistema
      * @param {UserRegisterInterface} data - As informações do novo usuário
-     * @returns {Promise<UserApiResponse>} - Promesa com a resposta da requisição
+     * @returns {Promise<AxiosResponse<UserApiResponse>>} - Promise com a resposta da requisição
      */
-    register: (data: UserRegisterInterface) => Promise<UserApiResponse>
+    register: (data: UserRegisterInterface) => Promise<AxiosResponse<UserApiResponse>>
 
 
     /**
      * Método para registrar um administrador no sistema (Temporário, será removido posteriormente)
      * @param data Informações do admin
+     * @returns {Promise<AxiosResponse<UserApiResponse>>}
      */
-    registerAdmin(data: UserRegisterInterface): Promise<UserApiResponse>
+    registerAdmin(data: UserRegisterInterface): Promise<AxiosResponse<UserApiResponse>>
 
 
     /* MÉTODOS ESPECIAIS */
@@ -64,13 +65,13 @@ export interface AuthServiceInterface {
      * Método para realizar o login do usuário e obter o token
      * JWT de autenticação
      * @param {UserLoginInterface} data - As informações de login
-     * @returns {Promise<AxiosResponse<UserLoginInterfaceResponse>>} - Promessa com a resposta da requisição com o token JWT
+     * @returns {Promise<AxiosResponse<UserApiResponse>>} - Promessa com a resposta da requisição com o token JWT
      */
-    login(data: UserLoginInterface): Promise<UserApiResponse>
+    login(data: UserLoginInterface): Promise<AxiosResponse<UserApiResponse>>
 
     /**
      * Método que retorna as informações do próprio usuário
      * @returns {Promise<AxiosResponse<User>>} - Promessa com a resposta da requisição
      */
-    me: () => Promise<AxiosResponse<User>>
+    me: () => Promise<AxiosResponse<ApiDefaultResponse<{ user: User }>>>
 }

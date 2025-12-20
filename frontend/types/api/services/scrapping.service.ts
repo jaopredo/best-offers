@@ -1,5 +1,6 @@
 import { ApiDefaultResponse } from ".."
 import { APISourceInterface } from "../source"
+import { AxiosResponse } from "axios"
 
 import { FontRegisterInterface } from "./font.service"
 import { AdapterRegisterInterface } from "./adapter.service"
@@ -26,7 +27,7 @@ export interface ScrappingServiceInterface {
      * Método para realizar o registro de um scrapping no sistema (Cria vários jobs para realizar o scrapping de acordo
      * com as informações passadas no corpo da requisição)
      * @param {ScrappingRegisterInterface} data - As informações do novo scrapping
-     * @returns {Promise<ScrappingApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<ScrappingApiResponse>>} - Promise com a resposta da requisição
      */
-    create (data: ScrappingRegisterInterface): Promise<ScrappingApiResponse>
+    create (data: ScrappingRegisterInterface): Promise<AxiosResponse<ScrappingApiResponse>>
 }

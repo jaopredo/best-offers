@@ -41,36 +41,36 @@ export interface ItemServiceInterface {
     /**
      * Método para realizar o registro de um item no sistema
      * @param {ItemRegisterInterface} data - As informações do novo item
-     * @returns {Promise<ItemApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<ItemApiResponse>>} - Promise com a resposta da requisição
      */
-    create (data: ItemRegisterInterface): Promise<ItemApiResponse>
+    create (data: ItemRegisterInterface): Promise<AxiosResponse<ItemApiResponse>>
 
     /**
      * Função para recuperar uma lista com todos os itens no sistema
      * @param {Pagination} pagination - Objeto com as informações de paginação
-     * @returns {Promise<ApiPaginationResponse<Item>>} - A paginação dos itens presentes no banco
+     * @returns {Promise<AxiosResponse<ApiPaginationResponse<Item>>>} - A paginação dos itens presentes no banco
      */
-    getAll(pagination?: Pagination): Promise<ApiPaginationResponse<Item>>
+    getAll(pagination?: Pagination): Promise<AxiosResponse<ApiPaginationResponse<Item>>>
 
     /**
      * Função para recuperar um item em específico
      * @param {number} id - ID de um item específico
-     * @returns {Promise<AxiosResponse<Item>>} - O item especificado
+     * @returns {Promise<AxiosResponse<ItemApiResponse>>} - O item especificado
      */
-    get(id: number): Promise<AxiosResponse<Item>>
+    get(id: number): Promise<AxiosResponse<ItemApiResponse>>
 
     /**
      * Atualiza as informações de um item especificado
      * @param {number} id - ID do item que será atualizado
      * @param {ItemUpdateInterface} data - Novas informações do item
-     * @returns {Promise<ItemApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<ItemApiResponse>>} - Promise com a resposta da requisição
      */
-    update(id: number, data: ItemUpdateInterface): Promise<ItemApiResponse>
+    update(id: number, data: ItemUpdateInterface): Promise<AxiosResponse<ItemApiResponse>>
 
     /**
      * Deleta um item baseado no ID passado
      * @param {number} id - ID do item que será deletado
-     * @returns {Promise<ItemApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<ItemApiResponse>>} - Promise com a resposta da requisição
      */
-    delete: (id: number) => Promise<ItemApiResponse>
+    delete: (id: number) => Promise<AxiosResponse<ItemApiResponse>>
 }

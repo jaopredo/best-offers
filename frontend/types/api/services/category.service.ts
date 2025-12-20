@@ -33,36 +33,36 @@ export interface CategoryServiceInterface {
     /**
      * Método para realizar o registro de uma categoria no sistema
      * @param {CategoryRegisterInterface} data - As informações da nova categoria
-     * @returns {Promise<CategoryApiResponse>} - Promesa com a resposta da requisição
+     * @returns {Promise<AxiosResponse<CategoryApiResponse>>} - Promise com a resposta da requisição
      */
-    create (data: CategoryRegisterInterface): Promise<CategoryApiResponse>
+    create (data: CategoryRegisterInterface): Promise<AxiosResponse<CategoryApiResponse>>
 
     /**
      * Função para recuperar uma lista com todas as categorias no sistema
      * @param {Pagination} pagination - Objeto com as informações de paginação
-     * @returns {Promise<ApiPaginationResponse<Category>>} - A paginação das categorias presentes no banco
+     * @returns {Promise<AxiosResponse<ApiPaginationResponse<Category>>>} - A paginação das categorias presentes no banco
      */
-    getAll(pagination?: Pagination): Promise<ApiPaginationResponse<Category>>
+    getAll(pagination?: Pagination): Promise<AxiosResponse<ApiPaginationResponse<Category>>>
 
     /**
      * Função para recuperar uma categoria em específico
      * @param {number} id - ID de uma categoria específica
-     * @returns {Promise<AxiosResponse<Category>>} - A categoria especificada
+     * @returns {Promise<AxiosResponse<CategoryApiResponse>>} - A categoria especificada
      */
-    get(id: number): Promise<AxiosResponse<Category>>
+    get(id: number): Promise<AxiosResponse<CategoryApiResponse>>
 
     /**
      * Atualiza as informações de uma categoria especificada
-     * @param {number} id - ID da demolição que será atualizado
-     * @param {DemolitionUpdateInterface} data - Novas informações da categoria
-     * @returns {Promise<CategoryApiResponse>} - Promise com a resposta da requisição
+     * @param {number} id - ID da categoria que será atualizada
+     * @param {CategoryUpdateInterface} data - Novas informações da categoria
+     * @returns {Promise<AxiosResponse<CategoryApiResponse>>} - Promise com a resposta da requisição
      */
-    update(id: number, data: CategoryUpdateInterface): Promise<CategoryApiResponse>
+    update(id: number, data: CategoryUpdateInterface): Promise<AxiosResponse<CategoryApiResponse>>
 
     /**
-     * Deleta uma categoria baseado no ID passado
+     * Deleta uma categoria baseada no ID passado
      * @param {number} id - ID da categoria que será deletada
-     * @returns {Promise<CategoryApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<CategoryApiResponse>>} - Promise com a resposta da requisição
      */
-    delete: (id: number) => Promise<CategoryApiResponse>
+    delete: (id: number) => Promise<AxiosResponse<CategoryApiResponse>>
 }

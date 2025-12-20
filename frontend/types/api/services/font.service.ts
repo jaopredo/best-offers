@@ -36,36 +36,36 @@ export interface FontServiceInterface {
     /**
      * Método para realizar o registro de uma font no sistema
      * @param {FontRegisterInterface} data - As informações da nova font
-     * @returns {Promise<FontApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<FontApiResponse>>} - Promise com a resposta da requisição
      */
-    create (data: FontRegisterInterface): Promise<FontApiResponse>
+    create (data: FontRegisterInterface): Promise<AxiosResponse<FontApiResponse>>
 
     /**
      * Função para recuperar uma lista com todas as fonts no sistema
      * @param {Pagination} pagination - Objeto com as informações de paginação
-     * @returns {Promise<ApiPaginationResponse<Font>>} - A paginação das fonts presentes no banco
+     * @returns {Promise<AxiosResponse<ApiPaginationResponse<Font>>>} - A paginação das fonts presentes no banco
      */
-    getAll(pagination?: Pagination): Promise<ApiPaginationResponse<Font>>
+    getAll(pagination?: Pagination): Promise<AxiosResponse<ApiPaginationResponse<Font>>>
 
     /**
      * Função para recuperar uma font em específico
      * @param {number} id - ID de uma font específica
-     * @returns {Promise<AxiosResponse<Font>>} - A font especificada
+     * @returns {Promise<AxiosResponse<FontApiResponse>>} - A font especificada
      */
-    get(id: number): Promise<AxiosResponse<Font>>
+    get(id: number): Promise<AxiosResponse<FontApiResponse>>
 
     /**
      * Atualiza as informações de uma font especificada
      * @param {number} id - ID da font que será atualizada
      * @param {FontUpdateInterface} data - Novas informações da font
-     * @returns {Promise<FontApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<FontApiResponse>>} - Promise com a resposta da requisição
      */
-    update(id: number, data: FontUpdateInterface): Promise<FontApiResponse>
+    update(id: number, data: FontUpdateInterface): Promise<AxiosResponse<FontApiResponse>>
 
     /**
      * Deleta uma font baseada no ID passado
      * @param {number} id - ID da font que será deletada
-     * @returns {Promise<FontApiResponse>} - Promise com a resposta da requisição
+     * @returns {Promise<AxiosResponse<FontApiResponse>>} - Promise com a resposta da requisição
      */
-    delete: (id: number) => Promise<FontApiResponse>
+    delete: (id: number) => Promise<AxiosResponse<FontApiResponse>>
 }
