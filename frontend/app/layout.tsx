@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ContextsProvider from "@/context";
+import Alerts from "@/components/alerts";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,6 +31,7 @@ export default function RootLayout({
             >
                 <ContextsProvider>
                     {children}
+                    <Alerts/>
                 </ContextsProvider>
             </body>
         </html>
