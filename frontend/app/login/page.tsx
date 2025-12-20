@@ -51,12 +51,13 @@ export default function Login() {
         setLoading(true)  // Indico que eu estou carregando as informações
         authService.login(data).then(resp => {
             // Quando minhas informações carregarem
-
             setLoading(false) // Digo que não está mais carregando
-            // Eu armazeno o token no meu localStorage
-            localStorage.setItem('token', resp?.data.token)
-            // Envio para a página principal
-            router.push('/')
+            if(resp) {
+                // Eu armazeno o token no meu localStorage
+                localStorage.setItem('token', resp?.data.token)
+                // Envio para a página principal
+                router.push('/')
+            }
         }).catch(() => setLoading(false))
     }
 

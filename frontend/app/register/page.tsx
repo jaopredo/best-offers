@@ -17,7 +17,6 @@ import ToggleTheme from "@/components/theme/toggle"
 import { IoMdPerson } from "react-icons/io"
 import { FaLock } from "react-icons/fa"
 import { AiOutlineLoading } from "react-icons/ai"
-import { Select } from "@/components/form/select"
 
 /* FONTES */
 const kumbh_sans = Kumbh_Sans({
@@ -60,12 +59,20 @@ export default function NewUser() {
             return
         }
         
-        authService.register(data).then(resp => {
+        const sendData = {
+            ...data,
+            confirmPassword: undefined
+        }
+        delete sendData.confirmPassword
+
+        authService.register(sendData).then(resp => {
             setLoading(false) // Digo que não está mais carregando
-            // Eu armazeno o token no meu localStorage
-            localStorage.setItem('token', resp.data.token)
-            // Envio para a página principal
-            router.push('/')
+            if(resp) {
+                // Eu armazeno o token no meu localStorage
+                localStorage.setItem('token', resp?.data.token)
+                // Envio para a página principal
+                router.push('/')
+            }
         }).catch(() => setLoading(false))
     }
 
@@ -89,8 +96,8 @@ export default function NewUser() {
                     className={"w-full md:w-[80%] mt-10 flex flex-col gap-5 items-center justify-center"}
                 >
                     <Input
-                        name="user"
-                        label="Usuário"
+                        name="name"
+                        label="Nome"
                         help="Digite o nome do usuário"
                         validation={{
                             required: {
