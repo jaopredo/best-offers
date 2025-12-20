@@ -85,8 +85,8 @@ services:
         build:
             context: ../frontend
             dockerfile: Dockerfile.dev
-        environment:
-            NODE_ENV: development
+        env_file:
+            - ../frontend/.env.development.local
         ports:
             - 8000:3000
         volumes:
