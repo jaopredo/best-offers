@@ -1,6 +1,8 @@
 // import ErrorStoreManager from "@/errors"
-import { ApiDefaultResponse } from "@/types/api"
+import { ApiDefaultResponse, ApiError } from "@/types/api"
 import APISource from "../source"
+import ErrorStoreManager from "@/alerts/errors"
+import SuccessStoreManager from "@/alerts/successes"
 
 /* TIPOS */
 import { UserLoginInterface, UserRegisterInterface, AuthServiceInterface, UserApiResponse, User } from "@/types/api/services/auth.service"
@@ -11,9 +13,10 @@ export default class AuthService implements AuthServiceInterface {
 
     async register (data: UserRegisterInterface) {
         try {
-            return await this.source.post<UserRegisterInterface, UserApiResponse>(data, 'register')
+            const response = await this.source.post<UserRegisterInterface, UserApiResponse>(data, 'register')
+            return response
         } catch (e: unknown) {
-            throw new Error('Não implementado')
+            throw new Error('Não Implementado')
         }
     }
 

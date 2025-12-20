@@ -50,7 +50,7 @@ export interface AuthServiceInterface {
      * @param {UserRegisterInterface} data - As informações do novo usuário
      * @returns {Promise<AxiosResponse<UserApiResponse>>} - Promise com a resposta da requisição
      */
-    register: (data: UserRegisterInterface) => Promise<AxiosResponse<UserApiResponse>>
+    register: (data: UserRegisterInterface) => Promise<AxiosResponse<UserApiResponse>|undefined>
 
 
     /**
