@@ -42,10 +42,10 @@ export interface FontServiceInterface {
 
     /**
      * Função para recuperar uma lista com todas as fonts no sistema
-     * @param {Pagination} pagination - Objeto com as informações de paginação
+     * @param {FontPagination} pagination - Objeto com as informações de paginação
      * @returns {Promise<AxiosResponse<ApiPaginationResponse<Font>>>} - A paginação das fonts presentes no banco
      */
-    getAll(pagination?: Pagination): Promise<AxiosResponse<ApiPaginationResponse<Font>>>
+    getAll(pagination?: FontPagination): Promise<AxiosResponse<ApiPaginationResponse<Font>>>
 
     /**
      * Função para recuperar uma font em específico

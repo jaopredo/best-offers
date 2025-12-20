@@ -33,10 +33,10 @@ export interface JobServiceInterface {
 
     /**
      * Função para recuperar uma lista com todos os jobs no sistema
-     * @param {Pagination} pagination - Objeto com as informações de paginação
+     * @param {JobPagination} pagination - Objeto com as informações de paginação
      * @returns {Promise<AxiosResponse<ApiPaginationResponse<Job>>>} - A paginação dos jobs presentes no banco
      */
-    getAll(pagination?: Pagination): Promise<AxiosResponse<ApiPaginationResponse<Job>>>
+    getAll(pagination?: JobPagination): Promise<AxiosResponse<ApiPaginationResponse<Job>>>
 
     /**
      * Função para recuperar um job em específico

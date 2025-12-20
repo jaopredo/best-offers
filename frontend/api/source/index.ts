@@ -19,27 +19,27 @@ export default class APISource implements APISourceInterface {
         this.route = route
     }
 
-    public get<R extends ApiDefaultResponse = ApiDefaultResponse>(path: string = '', config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
+    public get<R = ApiDefaultResponse>(path: string = '', config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
         config = updateRequestHeaders(config)
         return AxiosInstance.get<R>(`${this.route}${path && '/'+path}`, config)
     }
 
-    public post<T, R extends ApiDefaultResponse = ApiDefaultResponse>(data: T, path: string='', config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
+    public post<T, R = ApiDefaultResponse>(data: T, path: string='', config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
         config = updateRequestHeaders(config)
         return AxiosInstance.post<R>(`${this.route}/${path}`, data, config)
     }
 
-    public patch<T, R extends ApiDefaultResponse = ApiDefaultResponse>(data: T, path: string = '', config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
+    public patch<T, R = ApiDefaultResponse>(data: T, path: string = '', config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
         config = updateRequestHeaders(config)
         return AxiosInstance.patch<R>(`${this.route}/${path}`, data, config)
     }
 
-    public put<T, R extends ApiDefaultResponse = ApiDefaultResponse>(data: T, path: string = '', config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
+    public put<T, R = ApiDefaultResponse>(data: T, path: string = '', config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
         config = updateRequestHeaders(config)
         return AxiosInstance.put<R>(`${this.route}/${path}`, data, config)
     }
 
-    public delete<R extends ApiDefaultResponse = ApiDefaultResponse>(path: string, config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
+    public delete<R = ApiDefaultResponse>(path: string, config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
         config = updateRequestHeaders(config)
         return AxiosInstance.delete<R>(`${this.route}/${path}`, config)
     }

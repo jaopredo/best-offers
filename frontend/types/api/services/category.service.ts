@@ -39,10 +39,10 @@ export interface CategoryServiceInterface {
 
     /**
      * Função para recuperar uma lista com todas as categorias no sistema
-     * @param {Pagination} pagination - Objeto com as informações de paginação
+     * @param {CategoryPagination} pagination - Objeto com as informações de paginação
      * @returns {Promise<AxiosResponse<ApiPaginationResponse<Category>>>} - A paginação das categorias presentes no banco
      */
-    getAll(pagination?: Pagination): Promise<AxiosResponse<ApiPaginationResponse<Category>>>
+    getAll(pagination?: CategoryPagination): Promise<AxiosResponse<ApiPaginationResponse<Category>>>
 
     /**
      * Função para recuperar uma categoria em específico

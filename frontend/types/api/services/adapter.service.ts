@@ -45,10 +45,10 @@ export interface AdapterServiceInterface {
 
     /**
      * Função para recuperar uma lista com todos os adapters no sistema
-     * @param {Pagination} pagination - Objeto com as informações de paginação
+     * @param {AdapterPagination} pagination - Objeto com as informações de paginação
      * @returns {Promise<AxiosResponse<ApiPaginationResponse<Adapter>>>} - A paginação dos adapters presentes no banco
      */
-    getAll(pagination?: Pagination): Promise<AxiosResponse<ApiPaginationResponse<Adapter>>>
+    getAll(pagination?: AdapterPagination): Promise<AxiosResponse<ApiPaginationResponse<Adapter>>>
 
     /**
      * Função para recuperar um adapter em específico

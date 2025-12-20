@@ -47,10 +47,10 @@ export interface ItemServiceInterface {
 
     /**
      * Função para recuperar uma lista com todos os itens no sistema
-     * @param {Pagination} pagination - Objeto com as informações de paginação
+     * @param {ItemPagination} pagination - Objeto com as informações de paginação
      * @returns {Promise<AxiosResponse<ApiPaginationResponse<Item>>>} - A paginação dos itens presentes no banco
      */
-    getAll(pagination?: Pagination): Promise<AxiosResponse<ApiPaginationResponse<Item>>>
+    getAll(pagination?: ItemPagination): Promise<AxiosResponse<ApiPaginationResponse<Item>>>
 
     /**
      * Função para recuperar um item em específico
