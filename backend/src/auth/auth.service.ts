@@ -22,7 +22,7 @@ export class AuthService {
      * Função responsável pelo registro do usuário dentro da database
      * @param {UserRegisterDto} userData Informações de registro do usuário
      */
-    async registerUser(userData: UserRegisterDto) {
+    async registerUser(userData: UserRegisterDto, role: 'user'|'admin') {
         const user = new User()
         user.email = userData.email
         user.name = userData.name
@@ -30,7 +30,7 @@ export class AuthService {
         // Nenhum usuário que está se registrando pode
         // ser registrado como administrador (Assim que registra),
         // apenas ser promovido posteriormente por outro administrador
-        user.role = 'user'
+        user.role = role
 
         await this.userRepository.save(user)
 
