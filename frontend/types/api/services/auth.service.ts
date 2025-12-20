@@ -39,8 +39,8 @@ export interface UserRegisterFormInterface extends UserRegisterInterface {
 export type User = Omit<UserRegisterInterface, 'password'>
 
 
-/* INTERFACE DO SERVIÇO DO USUÁRIO */
-export interface UserServiceInterface {
+/* INTERFACE DO SERVIÇO DE AUTENTIFICAÇÃO */
+export interface AuthServiceInterface {
     source: APISourceInterface
 
     /* MÉTODOS BÁSICOS */

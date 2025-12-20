@@ -25,8 +25,8 @@ export type CategoryPagination = Pagination & {
 }
 
 
-/* INTERFACE DO SERVIÇO DAS DEMOLIÇÕES */
-export interface DemolitionServiceInterface {
+/* INTERFACE DO SERVIÇO DAS CATEGORIAS */
+export interface CategoryServiceInterface {
     source: APISourceInterface
 
     /* MÉTODOS BÁSICOS */
