@@ -4,7 +4,6 @@ import ContextsProvider from "@/context";
 
 /* COMPONENTES */
 import Alerts from "@/components/alerts";
-import Header from '@/components/header';
 
 /* ESTILO */
 import "./globals.css";
@@ -35,7 +34,6 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col overflow-x-hidden`}
             >
                 <ContextsProvider>
-                    <Header/>
                     {children}
                     <Alerts/>
                 </ContextsProvider>
