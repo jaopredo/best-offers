@@ -33,11 +33,11 @@ export default function ItemCard({
 
 
 	return <li className={`
-		flex flex-col items-center
+		flex gap-2 md:flex-col items-center
 	`}>
 		<Link href={`/items/${id}`}>
 			<div className={`
-				rounded-lg md:p-15 group
+				rounded-lg md:p-15 group pt-8 pb-8 pl-5 pr-5
 				${themeSetup('bg-neutral-300', 'bg-[#0b101f]', theme)}
 			`}>
 				<CiShoppingBasket size={100}  className={`
@@ -45,13 +45,13 @@ export default function ItemCard({
 					${themeSetup('text-neutral-500', 'text-white', theme)}
 				`}/>
 
-				<p className={`opacity-0 group-hover:opacity-100 transition-all ${themeSetup('text-neutral-500', 'text-white', theme)}`}>Ver detalhes</p>
+				<p className={`hidden md:block opacity-0 group-hover:opacity-100 transition-all ${themeSetup('text-neutral-500', 'text-white', theme)}`}>Ver detalhes</p>
 			</div>
 		</Link>
 		<div>
 			<ul>
 				<li className={`font-bold text-lg ${themeSetup('text-[#004E81]', 'text-sky-600', theme)}`}>{truncateString(name)}</li>
-				<li className={`font-bold text-xl ${themeSetup('text-gray-800', 'text-white', theme)}`}>{price}</li>
+				<li className={`font-bold text-xl ${themeSetup('text-gray-800', 'text-white', theme)}`}>R${price}</li>
 				{ seller && <li className={`font-bold text-sm ${themeSetup('text-gray-600', 'text-sky-800', theme)}`}>{truncateString(seller, 15)}</li> }
 				<li className={`font-bold hover:underline ${themeSetup('text-[#004E81]', 'text-sky-600', theme)}`}><Link href={url} target="_blank" rel="noopener noreferrer">Visitar</Link></li>
 			</ul>
