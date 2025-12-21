@@ -68,7 +68,7 @@ export interface AuthServiceInterface {
      * @param {UserLoginInterface} data - As informações de login
      * @returns {Promise<AxiosResponse<UserApiResponse>>} - Promessa com a resposta da requisição com o token JWT
      */
-    login(data: UserLoginInterface): Promise<AxiosResponse<UserApiResponse>>
+    login(data: UserLoginInterface): Promise<AxiosResponse<UserApiResponse>|undefined>
 
     /**
      * Método que retorna as informações do próprio usuário

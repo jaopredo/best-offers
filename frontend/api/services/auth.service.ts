@@ -1,8 +1,13 @@
 // import ErrorStoreManager from "@/errors"
 import { ApiDefaultResponse, ApiError } from "@/types/api"
 import APISource from "../source"
+
+/* ALERT MANAGERS */
 import ErrorStoreManager from "@/alerts/errors"
 import SuccessStoreManager from "@/alerts/successes"
+
+/* UTILS */
+import { alertSetup } from "@/utils/alerts"
 
 /* TIPOS */
 import { UserLoginInterface, UserRegisterInterface, AuthServiceInterface, UserApiResponse, User } from "@/types/api/services/auth.service"
@@ -14,9 +19,11 @@ export default class AuthService implements AuthServiceInterface {
     async register (data: UserRegisterInterface) {
         try {
             const response = await this.source.post<UserRegisterInterface, UserApiResponse>(data, 'register')
+            alertSetup(response.data.message, SuccessStoreManager)
             return response
         } catch (e: unknown) {
-            throw new Error('Não Implementado')
+            const err = e as ApiError
+            alertSetup(err.response?.data.message || 'Erro Desconhecido', ErrorStoreManager)
         }
     }
 
@@ -39,9 +46,12 @@ export default class AuthService implements AuthServiceInterface {
     async login (data: UserLoginInterface) {
         try {
             // Tento fazer a chamada para a API de login
-            return await this.source.post<UserLoginInterface, UserApiResponse>(data, `login`)
+            const response = await this.source.post<UserLoginInterface, UserApiResponse>(data, `login`)
+            alertSetup(response.data.message, SuccessStoreManager)
+            return response
         } catch (e: unknown) {
-            throw new Error('Não implementado')
+            const err = e as ApiError
+            alertSetup(err.response?.data.message || 'Erro Desconhecido', ErrorStoreManager)
         }
     }
 }
