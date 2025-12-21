@@ -29,15 +29,17 @@ export type Pagination = {
     limit?: number
 }
 
+export type PaginationMeta = {
+    page: number,
+    limit: number,
+    total: number,
+    totalPages: number
+}
+
 /**
  * Tipo padrão das respostas de paginação
  */
 export type ApiPaginationResponse<T=unknown> = AxiosResponse<{
     data: T[],
-    meta: {
-        page: number,
-        limit: number,
-        total: number,
-        totalPages: number
-    }
+    meta: PaginationMeta
 }>
