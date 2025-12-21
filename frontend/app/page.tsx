@@ -11,7 +11,6 @@ import { useAPIContext } from "@/context/api"
 import { useThemeContext } from "@/context/theme"
 
 /* COMPONENTES */
-import ToggleTheme from "@/components/theme/toggle"
 import ItemCard from "@/components/item"
 import { AiOutlineLoading } from "react-icons/ai"
 import NotFound from '@/components/not-found'
@@ -84,75 +83,67 @@ export default function Home() {
         )}`
     }
 
-    return <>
-            <header className={`p-5 flex items-center justify-between ${themeSetup('bg-neutral-100', 'bg-[#152338]', theme)}`}>
-                <h1 className={`text-2xl font-bold
-                    ${themeSetup('text-[#004E81]', 'text-white', theme)}
-                `}>SCRAPPER</h1>
-                <ToggleTheme/>
-            </header>
-            <main className={`relative flex gap-5 flex-col items-stretch justify-center flex-1 p-5 flex-col ${themeSetup('bg-neutral-200', 'bg-[#10161F]', theme)}`}>
-                <div className={`
-                    flex items-center justify-end
-                `}>
-                    <button className={`
-                        flex items-center justify-center gap-2 p-2 rounded-sm bg-white ring-1 ring-offset-1 hover:bg-gray-100
-                        font-bold self-end
-                    `} onClick={() => setSeeFilter(!seeFilter)}>
-                        <IoFilter/>
+    return <main className={`relative flex gap-5 flex-col items-stretch justify-center flex-1 p-5 flex-col ${themeSetup('bg-neutral-200', 'bg-[#10161F]', theme)}`}>
+            <div className={`
+                flex items-center justify-end
+            `}>
+                <button className={`
+                    flex items-center justify-center gap-2 p-2 rounded-sm bg-white ring-1 ring-offset-1 hover:bg-gray-100
+                    font-bold self-end
+                `} onClick={() => setSeeFilter(!seeFilter)}>
+                    <IoFilter/>
 
-                        Filtro
-                    </button>    
-                </div>
-                { loading && <div className='flex flex-col items-center justify-center w-full flex-1 gap-2'>
-                    <AiOutlineLoading className={`animate-spin ${themeSetup('text-[#004E81]', 'text-white', theme)}`} size={30}/>
-                    <p className={`${themeSetup('text-[#004E81]', 'text-white', theme)}`}>Carregando...</p>
-                </div> }
+                    Filtro
+                </button>    
+            </div>
+            { loading && <div className='flex flex-col items-center justify-center w-full flex-1 gap-2'>
+                <AiOutlineLoading className={`animate-spin ${themeSetup('text-[#004E81]', 'text-white', theme)}`} size={30}/>
+                <p className={`${themeSetup('text-[#004E81]', 'text-white', theme)}`}>Carregando...</p>
+            </div> }
 
-                { (!loading && items.length == 0) && <NotFound/> }
+            { (!loading && items.length == 0) && <NotFound/> }
 
-                { (!loading && items.length != 0) && <ul className='flex items-stretch justify-center flex-col md:flex-wrap md:flex-row w-[95%] md:w-full gap-5 flex-1'>
-                    {items.map((item, idx) => <ItemCard key={idx} {...item}/>)}
-                </ul> }
+            { (!loading && items.length != 0) && <ul className='flex items-stretch justify-center flex-col md:flex-wrap md:flex-row w-[95%] md:w-full gap-5 flex-1'>
+                {items.map((item, idx) => <ItemCard key={idx} {...item}/>)}
+            </ul> }
 
-                {(paginationMeta && paginationMeta.totalPages > 0) && <PaginationSection<ItemPagination>
-                    pagination={pagination}
-                    setPagination={setPagination}
-                    meta={paginationMeta}
-                />}
+            {(paginationMeta && paginationMeta.totalPages > 0) && <PaginationSection<ItemPagination>
+                pagination={pagination}
+                setPagination={setPagination}
+                meta={paginationMeta}
+            />}
 
-                <Filter<ItemPagination>
-                    show={seeFilter}
-                    setShow={setSeeFilter}
-                    pagination={pagination}
-                    setPagination={setPagination}
-                    schema={[
-                        {
-                            formtool: 'text',
-                            label: 'Nome',
-                            name: 'name',
-                            ...inputStyles
-                        },
-                        {
-                            formtool: 'number',
-                            label: 'Preço',
-                            name: 'price',
-                            ...inputStyles
-                        },
-                        {
-                            formtool: 'text',
-                            label: 'Vendedor',
-                            name: 'seller',
-                            ...inputStyles
-                        },
-                        {
-                            formtool: 'text',
-                            label: 'URL',
-                            name: 'url',
-                            ...inputStyles
-                        }
-                    ]}
-                />
-            </main>
-    </>
+            <Filter<ItemPagination>
+                show={seeFilter}
+                setShow={setSeeFilter}
+                pagination={pagination}
+                setPagination={setPagination}
+                schema={[
+                    {
+                        formtool: 'text',
+                        label: 'Nome',
+                        name: 'name',
+                        ...inputStyles
+                    },
+                    {
+                        formtool: 'number',
+                        label: 'Preço',
+                        name: 'price',
+                        ...inputStyles
+                    },
+                    {
+                        formtool: 'text',
+                        label: 'Vendedor',
+                        name: 'seller',
+                        ...inputStyles
+                    },
+                    {
+                        formtool: 'text',
+                        label: 'URL',
+                        name: 'url',
+                        ...inputStyles
+                    }
+                ]}
+            />
+        </main>
 }

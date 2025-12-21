@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ContextsProvider from "@/context";
+
+/* COMPONENTES */
 import Alerts from "@/components/alerts";
+import Header from '@/components/header';
+
+/* ESTILO */
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,6 +35,7 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col overflow-x-hidden`}
             >
                 <ContextsProvider>
+                    <Header/>
                     {children}
                     <Alerts/>
                 </ContextsProvider>
