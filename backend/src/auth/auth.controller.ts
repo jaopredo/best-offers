@@ -10,12 +10,15 @@ import {
     UseGuards,
     Req
 } from "@nestjs/common"
-import { Request } from 'express'
 import { JwtService } from "@nestjs/jwt"
 import bcrypt from 'bcrypt'
+import { Request } from 'express'
 
 /* TIPOS */
-import { UserRegisterDto, UserLoginDto } from "types/auth/auth.dto"
+import { UserRegisterDto, UserLoginDto, UserInterface } from "types/auth/auth.dto"
+interface RequestWithUser extends Request {
+  user: Omit<UserInterface, 'password'|'id'>
+}
 
 /* GUARDS */
 import { JwtAuthGuard, RolesGuard } from "./auth.guard"
@@ -110,7 +113,7 @@ export class AuthController {
 
     @Get('/me')
     @UseGuards(JwtAuthGuard)
-    async me(@Req() req: Request) {
+    async me(@Req() req: RequestWithUser) {
         return {
             message: 'Informações extraídas com sucesso',
             statusCode: 200,
