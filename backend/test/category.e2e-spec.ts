@@ -150,7 +150,13 @@ describe('Category (e2e)', () => {
         it('Pegar uma categoria específica', async () => {
             const getRes = await userRequest(request(app.getHttpServer()).get(`/category/${category1.id}`))
                 .expect(200)
-            expect(getRes.body).toStrictEqual(category1)
+            expect(getRes.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    category: category1
+                })
+            )
         })
 
         it('Tenta requisição sem token', async () => {
@@ -249,8 +255,12 @@ describe('Category (e2e)', () => {
                 .expect(200)
             
             expect(getRes.body).toStrictEqual({
-                id: category1.id,
-                name: 'New Category Name'
+                message: expect.any(String),
+                statusCode: 200,
+                category: {
+                    id: category1.id,
+                    name: 'New Category Name'
+                }
             })
         })
 

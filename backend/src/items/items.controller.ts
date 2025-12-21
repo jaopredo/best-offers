@@ -55,7 +55,11 @@ export class ItemController {
 
         if (!foundItem) throw new NotFoundException('Item especificado não encontrado')
         
-        return foundItem
+        return {
+            message: 'Item encontrado com sucesso',
+            statusCode: 200,
+            item: foundItem
+        }
     }
 
     @Get()

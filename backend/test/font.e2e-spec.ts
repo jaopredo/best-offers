@@ -221,7 +221,13 @@ describe('Font (e2e)', () => {
         it('Pegar uma fonte específica', async () => {
             const res = await userRequest(request(app.getHttpServer()).get(`/font/${font1.id}`))
                 .expect(200)
-            expect(res.body).toStrictEqual(font1)
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    font: font1
+                })
+            )
         })
 
         it('Tenta requisição sem token', async () => {
@@ -265,7 +271,7 @@ describe('Font (e2e)', () => {
             )
         })
 
-        it('Pegar várias fontes (Com banco vazio)', async () => {
+        it('Pegar várias fontes (Com banco pesquisa)', async () => {
             const res = await userRequest(request(app.getHttpServer()).get(`/font`))
                 .query({
                     name: 'Foo'
@@ -319,10 +325,16 @@ describe('Font (e2e)', () => {
             const getRes = await userRequest(request(app.getHttpServer()).get(`/font/${font1.id}`))
                 .expect(200)
             
-            expect(getRes.body).toStrictEqual({
-                ...font1,
-                name: 'Mock Test'
-            })
+            expect(getRes.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    font: {
+                        ...font1,
+                        name: 'Mock Test'
+                    }
+                })
+            )
         })
 
         it('Troca o adapter da fonte', async () => {
@@ -354,10 +366,16 @@ describe('Font (e2e)', () => {
             const getRes = await userRequest(request(app.getHttpServer()).get(`/font/${font1.id}`))
                 .expect(200)
             
-            expect(getRes.body).toStrictEqual({
-                ...font1,
-                adapter: substituteAdapter
-            })
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    font: {
+                        ...font1,
+                        adapter: substituteAdapter
+                    }
+                })
+            )
         })
 
         it('Tenta acessar sem token', async() => {
