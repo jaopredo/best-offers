@@ -1,17 +1,24 @@
 import {
     Controller,
     Post,
+    Get,
     Body,
     HttpCode,
     BadRequestException,
     UnauthorizedException,
     NotFoundException,
+    UseGuards,
+    Req
 } from "@nestjs/common"
+import { Request } from 'express'
 import { JwtService } from "@nestjs/jwt"
 import bcrypt from 'bcrypt'
 
 /* TIPOS */
 import { UserRegisterDto, UserLoginDto } from "types/auth/auth.dto"
+
+/* GUARDS */
+import { JwtAuthGuard, RolesGuard } from "./auth.guard"
 
 /* SERVIÇOS */
 import { AuthService } from "./auth.service"
@@ -98,6 +105,20 @@ export class AuthController {
                 role: user.role
             }),
             statusCode: 200
+        }
+    }
+
+    @Get('/me')
+    @UseGuards(JwtAuthGuard)
+    async me(@Req() req: Request) {
+        return {
+            message: 'Informações extraídas com sucesso',
+            statusCode: 200,
+            user: {
+                name: req.user.name,
+                email: req.user.email,
+                role: req.user.role
+            }
         }
     }
 }
