@@ -9,7 +9,7 @@ import { getWrapperProperties } from '@/utils/component'
 import { SelectProps, OptionType } from '@/types/components/select'
 
 
-export function Select (props: SelectProps) {
+export default function Select (props: SelectProps) {
 	const { register, setValue } = useFormContext()
 	const [ showDropdown, setShowDropdown ] = useState<boolean>(false)
 	const [ inputLabel, setInputLabel ] = useState<string>('')
