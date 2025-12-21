@@ -13,18 +13,18 @@ import { useThemeContext } from "@/context/theme"
 import { themeSetup } from "@/utils/theme"
 
 
-export type PaginationProps = PaginationMeta & {
-	setPagination: Dispatch<SetStateAction<Pagination>>
-	pagination: Pagination,
+export type PaginationProps<T extends Pagination> = PaginationMeta & {
+	setPagination: Dispatch<SetStateAction<T>>
+	pagination: T,
 	meta: PaginationMeta
 }
 
 
-export default function PaginationSection({
+export default function PaginationSection<T extends Pagination>({
 	setPagination,
 	pagination,
 	meta
-}: PaginationProps) {
+}: PaginationProps<T>) {
 	const { theme } = useThemeContext()
 
 	const pages = useMemo(() => {
@@ -60,7 +60,7 @@ export default function PaginationSection({
 
 
 	function goNext() {
-		if (pagination.page == pagination.totalPages) return
+		if (pagination.page == meta.totalPages) return
 		setPagination({
 			...pagination,
 			page: pagination.page+1
@@ -68,7 +68,7 @@ export default function PaginationSection({
 	}
 
 	function goPrevious() {
-		if (pagination.page == 0) return
+		if (pagination.page == 1) return
 		setPagination({
 			...pagination,
 			page: pagination.page-1
@@ -85,7 +85,7 @@ export default function PaginationSection({
 			${themeSetup('text-gray-700 hover:text-black hover:border-t-gray-700 hover:border-t-2', 'text-gray-400 hover:text-white hover:border-t-white', theme)}
 		`} onClick={goPrevious}>
 			<FaArrowLeft/>
-			Anterior
+			<p className='hidden md:block'>Anterior</p>
 		</button>
 
 
@@ -115,7 +115,7 @@ export default function PaginationSection({
 			${themeSetup('text-gray-700 hover:text-black hover:border-t-gray-700 hover:border-t-2', 'text-gray-400 hover:text-white hover:border-t-white', theme)}
 		`} onClick={goNext}>
 			<FaArrowRight/>
-			Próximo
+			<p className='hidden md:block'>Próximo</p>
 		</button>
 	</div>
 }
