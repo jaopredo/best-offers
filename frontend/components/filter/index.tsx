@@ -61,10 +61,10 @@ export default function Filter<T extends Pagination>({
 		<div className={`
 			transition-all w-[90%] p-5
 
-			fixed top-1/2 left-1/2 -translate-1/2
+			fixed top-1/2 left-1/2 -translate-1/2 rounded-md
 
 			md:absolute md:w-fit md:top-0 md:bottom-auto md:left-auto md:h-full md:right-0
-			md:-translate-y-0 md:block
+			md:-translate-y-0 md:block md:rounded-none
 
 			${show ? 'block md:translate-x-0' : 'hidden md:translate-x-[100%]'}
 			${themeSetup('bg-gray-100', 'bg-[#1b212b]', theme)}
