@@ -178,7 +178,13 @@ describe('Adapter (e2e)', () => {
         it('Pegar um adapter específica', async () => {
             const res = await userRequest(request(app.getHttpServer()).get(`/adapter/${adapter1.id}`))
                 .expect(200)
-            expect(res.body).toStrictEqual(adapter1)
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    adapter: adapter1
+                })
+            )
         })
 
         it('Tenta requisição sem token', async () => {
@@ -275,10 +281,16 @@ describe('Adapter (e2e)', () => {
             const getRes = await userRequest(request(app.getHttpServer()).get(`/adapter/${adapter1.id}`))
                 .expect(200)
             
-            expect(getRes.body).toStrictEqual({
-                ...adapter1,
-                sep: 'test-sep'
-            })
+            expect(getRes.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    adapter: {
+                        ...adapter1,
+                        sep: 'test-sep'
+                    }
+                })
+            )
         })
 
         it('Tenta acessar sem token', async() => {

@@ -253,14 +253,22 @@ describe('Authentication (e2e)', () => {
             const getFontRes = await adminRequest(request(app.getHttpServer()).get(`/font/${font2.id}`))
             expect(getFontRes.body).toEqual(
                 expect.objectContaining({
-                    ...font2,
-                    adapter: adapter2
+                    message: expect.any(String),
+                    statusCode: 200,
+                    font: {
+                        ...font2,
+                        adapter: adapter2
+                    }
                 })
             )
 
             const getAdapterRes = await adminRequest(request(app.getHttpServer()).get(`/adapter/${adapter2.id}`))
             expect(getAdapterRes.body).toEqual(
-                expect.objectContaining(adapter2)
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    adapter: adapter2
+                })
             )
         })
 
@@ -303,8 +311,12 @@ describe('Authentication (e2e)', () => {
             const res = await userRequest(request(app.getHttpServer()).get(`/job/${job1.id}`))
             expect(res.body).toEqual(
                 expect.objectContaining({
-                    ...job1,
-                    status: expect.stringMatching(/^(running|failed|success)$/)
+                    message: expect.any(String),
+                    statusCode: 200,
+                    job: {
+                        ...job1,
+                        status: expect.stringMatching(/^(running|failed|success)$/)
+                    }
                 })
             )
         })

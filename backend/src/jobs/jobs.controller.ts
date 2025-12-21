@@ -44,7 +44,11 @@ export class JobController {
 
         if (!foundJob) throw new NotFoundException('Job solicitado não encontrado')
 
-        return foundJob
+        return {
+            message: 'Job encontrado com sucesso',
+            statusCode: 200,
+            job: foundJob
+        }
     }
 
     @Get()

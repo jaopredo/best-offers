@@ -55,7 +55,11 @@ export class FontController {
 
         if (!foundFont) throw new NotFoundException('Fonte especificada não encontrada')
         
-        return foundFont
+        return {
+            message: 'Fonte encontrada com sucesso',
+            statusCode: 200,
+            font: foundFont
+        }
     }
 
     @Get()

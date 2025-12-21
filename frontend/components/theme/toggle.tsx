@@ -1,3 +1,4 @@
+'use client'
 import { useEffect, useState } from "react"
 import { useThemeContext } from "@/context/theme"
 import { motion } from 'motion/react'

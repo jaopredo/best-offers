@@ -284,7 +284,13 @@ describe('Item (e2e)', () => {
         it('Pegar um item específico', async () => {
             const get_res = await userRequest(request(app.getHttpServer()).get(`/item/${item.id}`))
                 .expect(200)
-            expect(get_res.body).toStrictEqual(item)
+            expect(get_res.body).toEqual(
+                expect.objectContaining({
+                    message: expect.any(String),
+                    statusCode: 200,
+                    item: item
+                })
+            )
         })
 
         it('Tenta requisição sem token', async () => {
@@ -384,8 +390,12 @@ describe('Item (e2e)', () => {
                 .expect(200)
             
             expect(get_res.body).toStrictEqual({
-                ...item,
-                name: 'Mock Item'
+                message: expect.any(String),
+                statusCode: 200,
+                item: {
+                    ...item,
+                    name: 'Mock Item'
+                }
             })
         })
 
@@ -413,8 +423,12 @@ describe('Item (e2e)', () => {
             const getRes = await userRequest(request(app.getHttpServer()).get(`/item/${item.id}`))
                 .expect(200)
             expect(getRes.body).toStrictEqual({
-                ...item,
-                font: font2
+                message: expect.any(String),
+                statusCode: 200,
+                item: {
+                    ...item,
+                    font: font2
+                }
             })
         })
 
@@ -443,8 +457,12 @@ describe('Item (e2e)', () => {
                 .expect(200)
             
             expect(getRes.body).toStrictEqual({
-                ...item,
-                category: category2
+                message: expect.any(String),
+                statusCode: 200,
+                item: {
+                    ...item,
+                    category: category2
+                }
             })
         })
 

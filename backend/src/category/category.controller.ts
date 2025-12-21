@@ -52,7 +52,11 @@ export class CategoryController {
 
         if (!foundCategory) throw new NotFoundException('Categoria solicitada não encontrada')
 
-        return foundCategory
+        return {
+            message: 'Categoria encontrada com sucesso',
+            statusCode: 200,
+            category: foundCategory
+        }
     }
 
     @Get()

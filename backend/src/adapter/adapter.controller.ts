@@ -53,7 +53,11 @@ export class AdapterController {
 
         if (!foundAdapter) throw new NotFoundException('Adapter especificado não encontrado')
         
-        return foundAdapter
+        return {
+            message: 'Adapter encontrado com sucesso',
+            statusCode: 200,
+            adapter: foundAdapter
+        }
     }
 
     @Get()
