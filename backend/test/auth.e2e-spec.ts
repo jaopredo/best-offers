@@ -158,4 +158,27 @@ describe('Authentication (e2e)', () => {
             })
         )
     })
+
+    it('Pega as informações de um usuário', async () => {
+        const res = await request(app.getHttpServer()).post('/auth/register')
+            .send(register_user_1)
+            .expect(201)
+        const { token } = res.body
+
+        const validationRes = await request(app.getHttpServer()).get('/auth/me')
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200)
+
+        expect(validationRes.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                statusCode: 200,
+                user: {
+                    name: register_user_1.name,
+                    email: register_user_1.email,
+                    role: expect.stringMatching(/^(admin|user)$/)
+                }
+            })
+        )
+    })
 })
