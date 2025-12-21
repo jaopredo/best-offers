@@ -51,7 +51,7 @@ export default function ItemCard({
 		<div>
 			<ul>
 				<li className={`font-bold text-lg ${themeSetup('text-[#004E81]', 'text-sky-600', theme)}`}>{truncateString(name)}</li>
-				<li className={`font-bold text-xl ${themeSetup('text-gray-800', 'text-white', theme)}`}>{price}</li>
+				<li className={`font-bold text-xl ${themeSetup('text-gray-800', 'text-white', theme)}`}>R${price}</li>
 				{ seller && <li className={`font-bold text-sm ${themeSetup('text-gray-600', 'text-sky-800', theme)}`}>{truncateString(seller, 15)}</li> }
 				<li className={`font-bold hover:underline ${themeSetup('text-[#004E81]', 'text-sky-600', theme)}`}><Link href={url} target="_blank" rel="noopener noreferrer">Visitar</Link></li>
 			</ul>

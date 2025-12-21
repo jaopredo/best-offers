@@ -64,7 +64,7 @@ export default function Home() {
                     {items.map((item, idx) => <ItemCard key={idx} {...item}/>)}
                 </ul> }
 
-                {paginationMeta && <PaginationSection
+                {(paginationMeta && paginationMeta.totalPages > 0) && <PaginationSection
                     pagination={pagination}
                     setPagination={setPagination}
                     meta={paginationMeta}
