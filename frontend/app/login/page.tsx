@@ -16,6 +16,8 @@ import ToggleTheme from "@/components/theme/toggle"
 import { IoMdPerson } from "react-icons/io"
 import { FaLock } from "react-icons/fa"
 import { AiOutlineLoading } from "react-icons/ai"
+import { FaArrowLeft } from "react-icons/fa6"
+
 
 /* FONTES */
 const kumbh_sans = Kumbh_Sans({
@@ -63,7 +65,17 @@ export default function Login() {
 
     return <main className={`w-screen h-screen flex items-center justify-center transition-colors overflow-hidden ${theme == 'light' ? 'bg-stone-300' : 'bg-[#10161F]'}`}>
         <section className={`w-[95%] md:w-[60vw] p-10 rounded-md flex items-center justify-center flex-col transition-colors ${theme == 'light' ? 'bg-[#F5F5F5]' : 'bg-[#233E51]'}`}>
-            <ToggleTheme className="self-start"/>
+            <div className="flex items-center justify-center gap-5 self-start">
+                <FaArrowLeft className={`
+                    transition-all
+                    text-xl
+                    hover:cursor-pointer
+                    ${theme == 'light' ? 'text-slate-900':'text-white'}
+                `} onClick={() => {
+                    router.back()
+                }}/>
+                <ToggleTheme/>
+            </div>
 
             <FormProvider {...methods}>
                 <form
