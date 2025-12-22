@@ -30,6 +30,7 @@ jobs:
         run: sleep 15
 
       - name: Rodando os testes
+        working-directory: backend
         run: yarn test:e2e
 
       - name: Build (Backend)
