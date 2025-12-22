@@ -32,7 +32,7 @@ export default function Home() {
     const [ paginationMeta, setPaginationMeta ] = useState<PaginationMeta>()
 
     /* State para mostrar o filtro */
-    const [ seeFilter, setSeeFilter ] = useState<boolean>(false)
+    const [ seeFilter, setSeeFilter ] = useState<b2oolean>(false)
 
     /* State que diz que eu estou carregando as informações */
     const [ loading, setIsLoading ] = useState<boolean>(true)
@@ -43,7 +43,6 @@ export default function Home() {
 
     useEffect(() => {
         setIsLoading(true)
-        console.log(pagination)
         itemService.getAll(pagination).then(resp => {
             setIsLoading(false)
             setItems(resp.data.data)
