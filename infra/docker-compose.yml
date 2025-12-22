@@ -100,7 +100,7 @@ services:
         ports:
             - "6379:6379"
         volumes:
-            - redis_data:/data
+            - redis_data_dev:/data
     
     n8n-dev:
         container_name: n8n.dev
@@ -131,3 +131,4 @@ volumes:
     postgres_data_tests:
     postgres_data_production:
     redis_data:
+    redis_data_dev:

@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (Backend)
+        working-directory: backend
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Instalar dependências (Backend)
+        working-directory: backend
+        run: yarn install
+
+      - name: Rodar ESLint (Backend)
+        working-directory: backend
+        run: yarn run lint
+
+      - name: Subindo os serviços
+        run: docker compose -f infra/docker-compose.yml db-tests redis-dev --build -d
+
+      - name: Esperando os serviços um pouco
+        run: sleep 15
+
+      - name: Rodando os testes
+        run: yarn test:e2e
+
+      - name: Build (Backend)
+        working-directory: backend
+        run: yarn run build
+
+      - name: Derrubar containers
+        if: always()
+        run: docker compose -f e2e/docker-compose.e2e.yml down -v
