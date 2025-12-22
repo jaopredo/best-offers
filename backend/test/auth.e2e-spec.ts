@@ -1,0 +1,185 @@
+import { INestApplication } from '@nestjs/common';
+import request from 'supertest';
+import { App } from 'supertest/types';
+import e2eSetup from './e2e.setup';
+
+/* REPOSITÓRIOS */
+import { DataSource } from 'typeorm';
+
+describe('Authentication (e2e)', () => {
+    let app: INestApplication<App>;
+    let dataSource: DataSource;
+
+    beforeAll(async () => {
+        const setup = await e2eSetup();
+        app = setup.app;
+        dataSource = setup.dataSource;
+    });
+
+    beforeEach(async () => {
+        // Resetando todas as informações no banco de teste para realizar os testes
+        // seguidamente quantas vezes eu quiser
+        const tableNames = dataSource.entityMetadatas
+            .map((entity) => `"${entity.tableName}"`)
+            .join(', ');
+
+        await dataSource.query(
+            `TRUNCATE ${tableNames} RESTART IDENTITY CASCADE`,
+        );
+    });
+
+    afterAll(async () => {
+        await app.close();
+    });
+
+    const register_user_1 = {
+        email: 'foo1@gmail.com',
+        password: '12345678',
+        name: 'Foo User 1',
+    };
+
+    const register_user_2 = {
+        email: 'foo2@gmail.com',
+        password: '12345678',
+        name: 'Foo User 2',
+    };
+
+    const login_user = {
+        email: 'foo1@gmail.com',
+        password: '12345678',
+    };
+
+    it('Passando o corpo faltando valores', async () => {
+        await request(app.getHttpServer())
+            .post('/auth/register')
+            .send({
+                name: 'Foo User',
+                email: 'foo@gmail',
+            })
+            .expect(400);
+
+        await request(app.getHttpServer())
+            .post('/auth/register')
+            .send({
+                name: 'Foo User',
+                password: '12345678',
+            })
+            .expect(400);
+
+        await request(app.getHttpServer())
+            .post('/auth/register')
+            .send({
+                email: 'foo@gmail',
+                password: '12345678',
+            })
+            .expect(400);
+    });
+
+    it('Registra um usuário, testa o registro de um mesmo email e testa o login', async () => {
+        // Registrando o usuário
+        const register_res = await request(app.getHttpServer())
+            .post('/auth/register')
+            .send(register_user_1)
+            .expect(201);
+        // Formato esperado da resposta do corpo da requisição
+        expect(register_res.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                token: expect.any(String),
+                statusCode: 201,
+            }),
+        );
+
+        // Tentando registrar o mesmo usuário novamente
+        const duplicate_register_res = await request(app.getHttpServer())
+            .post('/auth/register')
+            .send(register_user_1)
+            .expect(400);
+        // Formato esperado da resposta do corpo da requisição
+        expect(duplicate_register_res.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                error: expect.any(String),
+                statusCode: 400,
+            }),
+        );
+
+        // Fazendo login do usuário antes registrado
+        const login_res = await request(app.getHttpServer())
+            .post('/auth/login')
+            .send(login_user)
+            .expect(200);
+        // Checando o corpo da requisição
+        expect(login_res.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                token: expect.any(String),
+                statusCode: 200,
+            }),
+        );
+    });
+
+    it('Tenta fazer login de um usuário que não está registrado', async () => {
+        const failed_login_res = await request(app.getHttpServer())
+            .post('/auth/login')
+            .send({
+                email: 'notRegisteredFoo@gmail.com',
+                password: '12345678',
+            })
+            .expect(404);
+        expect(failed_login_res.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                error: expect.any(String),
+                statusCode: 404,
+            }),
+        );
+    });
+
+    it('Tenta fazer login incorreto de um usuário (Senha incorreta)', async () => {
+        await request(app.getHttpServer())
+            .post('/auth/register')
+            .send(register_user_2)
+            .expect(201);
+
+        const failed_login_res = await request(app.getHttpServer())
+            .post('/auth/login')
+            .send({
+                email: register_user_2.email,
+                password: 'wrong password',
+            })
+            .expect(401);
+        expect(failed_login_res.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                statusCode: 401,
+                error: expect.any(String),
+            }),
+        );
+    });
+
+    it('Pega as informações de um usuário', async () => {
+        const res = await request(app.getHttpServer())
+            .post('/auth/register')
+            .send(register_user_1)
+            .expect(201);
+        const { token } = res.body;
+
+        const validationRes = await request(app.getHttpServer())
+            .get('/auth/me')
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+
+        expect(validationRes.body).toEqual(
+            expect.objectContaining({
+                message: expect.any(String),
+                statusCode: 200,
+                user: {
+                    name: register_user_1.name,
+                    email: register_user_1.email,
+                    role: expect.stringMatching(/^(admin|user)$/),
+                },
+            }),
+        );
+    });
+});

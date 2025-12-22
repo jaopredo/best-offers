@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar dependências (Backend)
+        working-directory: backend
+        run: yarn install
+
+      - name: Rodar ESLint (Backend)
+        working-directory: backend
+        run: yarn run lint
+
+      - name: Subindo os serviços
+        working-directory: infra
+        run: docker compose up db-tests redis-dev --build -d
+
+      - name: Esperando os serviços um pouco
+        run: sleep 15
+
+      - name: Rodando os testes
+        env:
+            REDIS_HOST: ${{ secrets.REDIS_HOST }}
+            REDIS_PORT: ${{ secrets.REDIS_PORT }}
+
+            JWT_SALT_ROUNDS: ${{ secrets.JWT_SALT_ROUNDS }}
+            JWT_SECRET: ${{ secrets.JWT_SECRET }}
+            JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+
+            DB_HOST: ${{ secrets.DB_HOST }}
+            DB_USER: ${{ secrets.DB_USER }}
+            DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+            DB_DB: ${{ secrets.DB_DB }}
+            DB_PORT: ${{ secrets.DB_PORT }}
+        working-directory: backend
+        run: yarn test:e2e
+
+      - name: Build (Backend)
+        working-directory: backend
+        run: yarn run build
+
+      - name: Derrubar containers
+        working-directory: infra
+        if: always()
+        run: docker compose down db-tests redis-dev -v
