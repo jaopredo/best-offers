@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 
 /* CONTEXTOS */
@@ -16,12 +17,17 @@ import { CgWebsite } from "react-icons/cg"
 import { BsFillBugFill } from "react-icons/bs"
 import { GiBroom } from "react-icons/gi"
 import { TiDocumentText } from "react-icons/ti"
+import { IoMdClose } from "react-icons/io"
+import { FiMenu } from "react-icons/fi"
+
 
 export default function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [ showMenu, setShowMenu ] = useState<boolean>(false)
+
   const { theme } = useThemeContext()
   const pathname = usePathname() // ex: "/admin/category"
   const page = pathname.split('/').filter(Boolean).pop()
@@ -125,9 +131,24 @@ export default function AdminLayout({
   ]
 
   return <div className='w-full min-h-screen flex items-stretch'>
-    <aside className={`border-r-1 p-2 w-1/4
+    <button className={`
+      md:hidden text-white fixed left-5 bottom-5 transition-all
+      bg-[#030714] p-2 rounded-full active:scale-95
+    `} onClick={() => setShowMenu(true)}>
+      <FiMenu size={25}/>
+    </button>
+    <aside className={`
+      border-r-1 p-2 absolute w-[80%] h-full transition-all
+      ${showMenu ? '-translate-x-0' : '-translate-x-[110%]'}
+      md:w-1/4 md:relative md:translate-0 md:h-auto
       ${themeSetup('bg-white border-[#e5e7eb]', 'bg-[#0e1624] border-[#262e3a]', theme)}
     `}>
+      <button onClick={() => setShowMenu(false)} className={`
+        md:hidden text-white absolute right-0 translate-x-[110%]
+      `}>
+        <IoMdClose size={25}/>
+      </button>
+
       <ToggleTheme/>
 
       <menu className='flex flex-col items-stretch w-full h-full gap-2 p-2 md:mt-8'>
