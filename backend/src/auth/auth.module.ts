@@ -1,18 +1,18 @@
-import { Module } from '@nestjs/common'
+import { Module } from '@nestjs/common';
 
 /* MÓDULOS */
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { JwtModule } from '@nestjs/jwt'
-import { ConfigModule, ConfigService } from '@nestjs/config'
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 /* CONTROLLERS */
-import { AuthController } from './auth.controller'
+import { AuthController } from './auth.controller';
 
 /* SERVIÇOS */
-import { AuthService } from './auth.service'
+import { AuthService } from './auth.service';
 
 /* REPOSITÓRIOS */
-import { User } from 'database/models/user.entity'
+import { User } from 'database/models/user.entity';
 
 @Module({
     imports: [
@@ -24,13 +24,13 @@ import { User } from 'database/models/user.entity'
                 global: true,
                 secret: config.get('JWT_SECRET'),
                 signOptions: {
-                    expiresIn: config.get('JWT_EXPIRATION')
-                }
-            })
-        })
+                    expiresIn: config.get('JWT_EXPIRATION'),
+                },
+            }),
+        }),
     ],
     controllers: [AuthController],
     providers: [AuthService],
-    exports: [JwtModule]
+    exports: [JwtModule],
 })
 export class AuthModule {}

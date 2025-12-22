@@ -1,8 +1,8 @@
-import { TestingModule, Test } from "@nestjs/testing"
-import { ConfigModule } from "@nestjs/config"
-import { AppModule } from "src/app.module"
-import { ValidationPipe } from "@nestjs/common"
-import { DataSource } from "typeorm"
+import { TestingModule, Test } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
+import { AppModule } from 'src/app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 
 export default async function e2eSetup() {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -10,11 +10,11 @@ export default async function e2eSetup() {
             ConfigModule.forRoot({
                 envFilePath: ['.env.test.local'],
             }),
-            AppModule
+            AppModule,
         ],
-    }).compile()
+    }).compile();
 
-    const app = moduleFixture.createNestApplication()
+    const app = moduleFixture.createNestApplication();
 
     app.useGlobalPipes(
         new ValidationPipe({
@@ -25,14 +25,14 @@ export default async function e2eSetup() {
                 enableImplicitConversion: true,
                 exposeUnsetFields: false,
             },
-        })
-    )
+        }),
+    );
 
-    await app.init()
+    await app.init();
 
-    const dataSource = app.get<DataSource>(DataSource)
+    const dataSource = app.get<DataSource>(DataSource);
 
-    await dataSource.synchronize()
+    await dataSource.synchronize();
 
-    return { app, dataSource }
+    return { app, dataSource };
 }

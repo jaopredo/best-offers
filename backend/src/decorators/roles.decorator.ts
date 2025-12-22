@@ -1,4 +1,4 @@
-import { Reflector } from "@nestjs/core"
+import { Reflector } from '@nestjs/core';
 
 // Decorador dos níveis de acesso
-export const Roles = Reflector.createDecorator<string[]>()
+export const Roles = Reflector.createDecorator<string[]>();

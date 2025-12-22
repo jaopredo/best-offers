@@ -26,3 +26,9 @@ export class UserLoginDto {
     @IsNotEmpty()
     password: string
 }
+
+export type JwtPayload = Omit<UserInterface, 'password' | 'id'>
+
+export interface RequestWithUser extends Request {
+    user: JwtPayload
+}
