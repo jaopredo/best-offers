@@ -130,7 +130,7 @@ export default function AdminLayout({
     },
   ]
 
-  return <div className='w-full min-h-screen flex items-stretch'>
+  return <div className='w-full h-screen overflow-hidden flex items-stretch'>
     <button className={`
       md:hidden text-white fixed left-5 bottom-5 transition-all
       bg-[#030714] p-2 rounded-full active:scale-95
