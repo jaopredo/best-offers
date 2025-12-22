@@ -30,6 +30,19 @@ jobs:
         run: sleep 15
 
       - name: Rodando os testes
+        env:
+            REDIS_HOST: ${{ secrets.REDIS_HOST }}
+            REDIS_PORT: ${{ secrets.REDIS_PORT }}
+
+            JWT_SALT_ROUNDS: ${{ secrets.JWT_SALT_ROUNDS }}
+            JWT_SECRET: ${{ secrets.JWT_SECRET }}
+            JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+
+            DB_HOST: ${{ secrets.DB_HOST }}
+            DB_USER: ${{ secrets.DB_USER }}
+            DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+            DB_DB: ${{ secrets.DB_DB }}
+            DB_PORT: ${{ secrets.DB_PORT }}
         working-directory: backend
         run: yarn test:e2e
 
@@ -38,5 +51,6 @@ jobs:
         run: yarn run build
 
       - name: Derrubar containers
+        working-directory: infra
         if: always()
-        run: docker compose -f e2e/docker-compose.e2e.yml down -v
+        run: docker compose down db-tests redis-dev -v
