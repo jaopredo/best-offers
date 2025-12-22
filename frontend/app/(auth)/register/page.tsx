@@ -31,7 +31,7 @@ import type { UserRegisterFormInterface } from "@/types/api/services/auth.servic
 /**
  * Página de novo usuário
  */
-export default function NewUser() {
+export default function Register() {
     // Router
     const router = useRouter()
     
