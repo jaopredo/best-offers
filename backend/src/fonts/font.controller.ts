@@ -45,7 +45,7 @@ export class FontController {
             );
 
         return {
-            message: 'Categoria criada com sucesso',
+            message: 'Fonte criada com sucesso',
             statusCode: 201,
             font: createdFont,
         };

@@ -63,36 +63,6 @@ export class AuthController {
         };
     }
 
-    // Essa rota é apenas para eu fazer os testes no frontend, será removida posteriormente
-    @Post('/registerAdmin')
-    async registerAdmin(@Body() user: UserRegisterDto) {
-        // Checando se já não existe um usuário registrado
-        // com o mesmo email
-        const users = await this.authService.getUser({ email: user.email });
-        if (users.length != 0) {
-            throw new BadRequestException(
-                'Um usuário com este email já está cadastrado',
-            );
-        }
-
-        // Cria o usuário no banco
-        const registeredUser = await this.authService.registerUser(
-            user,
-            'admin',
-        );
-
-        // Retorna uma mensagem de sucesso
-        return {
-            message: 'Administrador registrado com sucesso',
-            token: await this.jwtService.signAsync({
-                name: registeredUser.name,
-                email: registeredUser.email,
-                role: registeredUser.role,
-            }),
-            statusCode: 201,
-        };
-    }
-
     @Post('/login')
     @HttpCode(200)
     async login(@Body() payload: UserLoginDto) {

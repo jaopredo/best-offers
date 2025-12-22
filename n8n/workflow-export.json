@@ -1,0 +1,284 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -48
+      ],
+      "id": "b682fce5-26bf-42da-8d66-5722177dbee0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "http://backend:3000/api/v1/font",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        -48
+      ],
+      "id": "0c0a8bc7-e918-4aee-aa64-04246e607a11",
+      "name": "Pegando as Fontes",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "GTl0QoCKJo6WHLZY",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const totalPages = $input.first().json.meta.totalPages\n\nreturn Array.from(\n  { length: totalPages },\n  (_, i) => ({ page: i + 1 })\n);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -48
+      ],
+      "id": "5d98d265-46d7-4670-a012-f85952999f23",
+      "name": "Páginas de Fontes"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        272,
+        -48
+      ],
+      "id": "67b74dc2-cc9b-4ff8-97d0-eb86a18761a7",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "http://backend:3000/api/v1/font",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "page",
+              "value": "={{ $json.page }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        480,
+        80
+      ],
+      "id": "3743469f-297c-4467-898e-eb4b43eded06",
+      "name": "Pegando fonte em página específica",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "GTl0QoCKJo6WHLZY",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "data"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -64
+      ],
+      "id": "a36cb919-fa44-49fe-9e85-0d60116494c5",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.first().json.data.map(font => ({...font}))"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        -64
+      ],
+      "id": "83f66fd9-79f6-478b-ab08-ab8c4be17a6b",
+      "name": "Extraindo todas as fontes"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://backend:3000/api/v1/scrapping",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "fontId",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        704,
+        176
+      ],
+      "id": "03ba8376-87c7-41e2-99bf-7c6cad9dc237",
+      "name": "Fazendo Scrapping",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "GTl0QoCKJo6WHLZY",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  message: 'Tudo ocorreu bem',\n  jobs: $input.first().json.jobs\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        176
+      ],
+      "id": "4de54d95-0d61-49ac-af04-e7332c8161be",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Pegando as Fontes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pegando as Fontes": {
+      "main": [
+        [
+          {
+            "node": "Páginas de Fontes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Páginas de Fontes": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pegando fonte em página específica",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pegando fonte em página específica": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Extraindo todas as fontes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraindo todas as fontes": {
+      "main": [
+        [
+          {
+            "node": "Fazendo Scrapping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fazendo Scrapping": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "41f9f790-7ca5-4515-a7eb-d03f10f131aa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "987f88de3b6a757b9aa72b4c3d8b938414795186c35bec885ed0c19c636c42c2"
+  },
+  "id": "OrJ8jm3pHArNJ6Sp",
+  "tags": []
+}

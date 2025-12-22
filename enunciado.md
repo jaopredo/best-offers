@@ -204,10 +204,10 @@ Adicionar pipeline no GitHub Actions (`.github/workflows/ci.yml`) com as etapas:
 - [X] docker-compose.yml funcional
 - [X] Autenticação e roles implementados
 - [X] Scraper funcional e integrado
-- [ ] Integração n8n testada e documentada
+- [X] Integração n8n testada e documentada
 - [ ] Frontend integrado ao backend
 - [X] Testes automatizados passando
-- [ ] CI configurado
+- [X] CI configurado
 
 ---
 
