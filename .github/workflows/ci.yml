@@ -23,7 +23,7 @@ jobs:
         run: yarn run lint
 
       - name: Subindo os serviços
-        run: docker compose -f infra/docker-compose.yml db-tests redis-dev --build -d
+        run: docker compose up -f infra/docker-compose.yml db-tests redis-dev --build -d
 
       - name: Esperando os serviços um pouco
         run: sleep 15
